@@ -77,7 +77,7 @@ const AnotherTest = () => {
           placeholder="category"
           type="text"
         />
-        <div style={{ width: "15rem" }}>
+        <div style={{ width: "15rem", position: "relative" }}>
           <input
             placeholder="search"
             onChange={handleChange}
@@ -91,7 +91,8 @@ const AnotherTest = () => {
               style={{
                 background: "gray",
                 height: "auto",
-                width: "auto",
+                width: "100%",
+                position: "absolute",
               }}
             >
               {results.length > 0 ? (
