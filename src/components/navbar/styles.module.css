@@ -1,0 +1,16 @@
+.navbar {
+  padding: 1.3rem !important;
+  background-color: #ffffff;
+  color: #808080;
+}
+.brandName {
+  color: #2dbe60;
+  -webkit-text-stroke: 0.2px black;
+}
+.names {
+  cursor: pointer;
+}
+.names:hover {
+  background-color: #2dbe60;
+  color: white;
+}

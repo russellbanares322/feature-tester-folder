@@ -1,0 +1,87 @@
+.container {
+  height: 100vh;
+  background: linear-gradient(
+    49deg,
+    rgba(11, 11, 11, 1) 0%,
+    rgba(195, 204, 206, 1) 55%,
+    rgba(195, 204, 206, 1) 100%
+  ) !important;
+}
+.sidebar {
+  position: absolute;
+  width: 19rem;
+  background: rgba(229, 230, 230, 0.94);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4.6px);
+  -webkit-backdrop-filter: blur(4.6px);
+  border-radius: 1rem;
+  height: 35rem;
+  margin-top: 3rem;
+  margin-left: 10rem;
+  z-index: 99999999999999999999999999999;
+}
+.main {
+  top: 3rem;
+  margin-left: 10rem;
+  position: relative;
+  width: 65rem;
+  height: 35rem;
+  border-radius: 2rem;
+  background: rgba(225, 230, 231, 0.36);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+.profile_wrapper {
+  padding-top: 1rem;
+  text-align: center;
+}
+.profile_icon {
+  background-color: #65b4e5;
+  border-radius: 2rem;
+  margin-bottom: 1rem;
+}
+.name {
+  font-weight: 700;
+  color: #5f7da3;
+}
+.role {
+  font-size: small;
+  color: #8ba8cf;
+}
+.icon {
+  margin-right: 1rem;
+}
+.ul {
+  list-style: none;
+  padding-top: 1rem;
+}
+.ul li {
+  margin-top: 2rem;
+  font-size: medium;
+  color: #8ba8cf;
+}
+.active {
+  background-color: white;
+  border-radius: 2rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  margin-right: 1.3rem;
+}
+.main_content {
+}
+.main_content input {
+  border: none;
+  background-color: #e6e8e8;
+  border-radius: 1rem;
+  width: 24rem;
+  height: 1.3rem;
+  margin-left: 22rem;
+  outline: none;
+}
+.main_content p {
+  color: #5f7ca2;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-left: 22rem;
+  padding-top: 3rem;
+}

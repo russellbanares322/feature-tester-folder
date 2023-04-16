@@ -1,0 +1,30 @@
+[
+    {
+        "id" : 1,
+        "name" : "Bag",
+        "price" : 4000,
+        "image" : "../src/assets/bag.jpg",
+        "stocks" : 4
+    },
+    {
+        "id" : 2,
+        "name" : "Bag",
+        "price" : 2000,
+        "image" : "../src/assets/bag.jpg",
+        "stocks" : 4
+    },
+    {
+        "id" : 3,
+        "name" : "Bag",
+        "price" : 20000,
+        "image" : "../src/assets/bag.jpg",
+        "stocks" : 4
+    },
+    {
+        "id" : 4,
+        "name" : "Bag",
+        "price" : 2000,
+        "image" : "../src/assets/bag.jpg",
+        "stocks" : 4
+    }
+]

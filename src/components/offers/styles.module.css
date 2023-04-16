@@ -1,0 +1,35 @@
+.body {
+    background-color: #E2D9C4;
+    margin-top: 15rem;
+    height: 90vh;
+}
+.serviceTitle {
+    color: #606060;
+    text-align: center;
+    font-size: 2.1rem;
+    padding-top: 3rem;
+    text-decoration: underline;
+}
+.title1{
+    font-size: 2rem;
+    color: #606060;
+    font-weight: 500;
+    margin-bottom: 2rem;
+}
+.title2{
+    color: #606060;
+    font-weight: 400;
+}
+
+/* Other Offers  */
+.otherOffersBody {
+    background-color: #F8F9FA;
+    height: 80vh;
+}
+.otherOffersTitle {
+    color: #606060;
+    text-align: center;
+    font-size: 2.1rem;
+    padding-top: 3rem;
+    text-decoration: underline;
+}
