@@ -12,9 +12,9 @@ const INPUT_DATA = {
   gender: "",
   isActive: true,
   address: "",
-  email: "",
   dateOfBirth: "",
   time: "",
+  email: [],
 };
 const FormContent = () => {
   const [inputs, setInputs] = useState(INPUT_DATA);

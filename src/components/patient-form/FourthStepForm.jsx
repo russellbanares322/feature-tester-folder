@@ -6,6 +6,7 @@ const FourthStepForm = ({ dateOfBirth, time, handleChangeFields }) => {
     <FormWrapper>
       <label>Birthdate</label>
       <input
+        style={{ width: "8rem", height: "3rem" }}
         type="date"
         value={dateOfBirth}
         onChange={(e) => handleChangeFields({ dateOfBirth: e.target.value })}
@@ -13,6 +14,7 @@ const FourthStepForm = ({ dateOfBirth, time, handleChangeFields }) => {
       <label>Selected Time</label>
       <input
         type="time"
+        placeholder="00: 00"
         value={time}
         onChange={(e) => handleChangeFields({ time: e.target.value })}
       />

@@ -13,6 +13,11 @@ const FirstStepForm = ({ inputs, handleChangeFields }) => {
   };
   return (
     <FormWrapper>
+      {inputs.email.length > 0 ? (
+        inputs.email.map((mail, index) => <h5 key={index}>{mail}</h5>)
+      ) : (
+        <h5>Sample email</h5>
+      )}
       <h5>{inputs.firstname}</h5>
       <h5>{inputs.lastname}</h5>
       <label>Firstname</label>

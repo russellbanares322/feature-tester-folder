@@ -1,7 +1,7 @@
 import React from "react";
 import FormWrapper from "./patient-form-wrapper/FormWrapper";
 
-const ThirdStepForm = ({ address, email, handleChangeFields }) => {
+const ThirdStepForm = ({ address, handleChangeFields }) => {
   return (
     <FormWrapper>
       <label>Address</label>
@@ -9,12 +9,6 @@ const ThirdStepForm = ({ address, email, handleChangeFields }) => {
         type="text"
         value={address}
         onChange={(e) => handleChangeFields({ address: e.target.value })}
-      />
-      <label>Email</label>
-      <input
-        type="text"
-        value={email}
-        onChange={(e) => handleChangeFields({ email: e.target.value })}
       />
     </FormWrapper>
   );
