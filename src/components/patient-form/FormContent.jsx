@@ -10,7 +10,7 @@ const INPUT_DATA = {
   firstname: "",
   lastname: "",
   gender: "",
-  isActive: "Yes",
+  isActive: true,
   address: "",
   email: "",
   dateOfBirth: "",
@@ -37,7 +37,7 @@ const FormContent = () => {
     isLastStep,
     isFirstStep,
   } = useMultiStepForm([
-    <FirstStepForm {...inputs} handleChangeFields={handleChangeFields} />,
+    <FirstStepForm inputs={inputs} handleChangeFields={handleChangeFields} />,
     <SecondStepForm {...inputs} handleChangeFields={handleChangeFields} />,
     <ThirdStepForm {...inputs} handleChangeFields={handleChangeFields} />,
     <FourthStepForm {...inputs} handleChangeFields={handleChangeFields} />,

@@ -23,16 +23,15 @@ const SecondStepForm = ({ gender, isActive, handleChangeFields }) => {
       <input
         type="radio"
         name="isActive"
-        value="Yes"
-        checked={isActive === "Yes"}
-        onChange={(e) => handleChangeFields({ isActive: e.target.value })}
+        checked={isActive === true}
+        onChange={(e) => handleChangeFields({ isActive: true })}
       />
       <input
         type="radio"
         name="isActive"
         value="No"
-        checked={isActive === "No"}
-        onChange={(e) => handleChangeFields({ isActive: e.target.value })}
+        checked={isActive === false}
+        onChange={(e) => handleChangeFields({ isActive: false })}
       />
     </FormWrapper>
   );
