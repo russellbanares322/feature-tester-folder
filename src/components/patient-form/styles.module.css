@@ -20,14 +20,10 @@
   width: auto;
 }
 .result {
-  appearance: none;
-  border: none;
-  outline: none;
-}
-.result:focus {
-  background: red;
-}
-.result:hover {
   background-color: gray;
+}
+
+.result:hover {
+  background-color: rgb(160, 160, 160);
   cursor: pointer;
 }

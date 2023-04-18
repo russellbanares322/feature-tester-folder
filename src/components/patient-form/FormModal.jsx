@@ -1,26 +1,31 @@
-import React, { useState, useRef } from "react";
-import { useEffect } from "react";
+import React, { useState } from "react";
 import styles from "./styles.module.css";
 
 const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
   const [input, setInput] = useState("");
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     handleChangeFields({ firstname: inputs.firstname });
     handleChangeFields({ lastname: inputs.lastname });
     handleCloseModal();
   };
 
-  const inputResultRef = useRef();
-
-  useEffect(() => {
-    if (inputResultRef.current) {
-      inputResultRef.current.focus();
-    }
-  }, []);
-
   const handleAddEmail = (selectedEmail) => {
     handleChangeFields({ email: [...inputs.email, selectedEmail] });
     setInput("");
+  };
+  const handleEnterEmail = (e) => {
+    if (["Enter"].includes(e.key)) {
+      e.preventDefault();
+
+      let email = e.target.value.trim();
+      if (email) {
+        handleChangeFields({
+          email: [...inputs.email, email],
+        });
+        setInput("");
+      }
+    }
   };
 
   const handleRemove = (selectedEmail) => {
@@ -31,7 +36,9 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
     <div className={styles["modal-overlay"]}>
       <div className={styles["modal-content"]}>
         <h5>{JSON.stringify(inputs.email)}</h5>
-        <button onClick={handleCloseModal}>Close</button>
+        <button type="button" onClick={handleCloseModal}>
+          Close
+        </button>
         <input
           type="text"
           value={inputs.firstname}
@@ -65,17 +72,13 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => handleEnterEmail(e)}
             type="email"
           />
           {input.includes("@") && input.length > 6 && (
-            <input
-              className={styles.result}
-              ref={inputResultRef}
-              onClick={() => handleAddEmail(input)}
-              value={input}
-              autoFocus
-              readOnly
-            />
+            <p onClick={handleAddEmail} className={styles.result}>
+              {input}
+            </p>
           )}
         </div>
       </div>
