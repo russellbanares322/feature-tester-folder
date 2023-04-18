@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./styles.module.css";
 
 const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
@@ -55,17 +55,17 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
   };
 
   const handlePaste = (e) => {
-    e.preventDefault();
-
     let paste = e.clipboardData.getData("text");
     let emails = paste.match(/[\w\d\.-]+@[\w\d\.-]+\.[\w\d\.-]+/g);
 
     if (emails) {
-      let toBeAdded = emails.filter((email) => inList(email));
+      let toBeAdded = emails.filter((email) => !inList(email));
 
       handleChangeFields({
         email: [...inputs.email, ...toBeAdded],
       });
+      setError("");
+      setInput("");
     }
   };
 
