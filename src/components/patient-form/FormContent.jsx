@@ -45,7 +45,6 @@ const FormContent = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!isLastStep) return handleNext();
     console.log(inputs);
     setResult(inputs);
     setIsDirty(false);
@@ -102,7 +101,12 @@ const FormContent = () => {
               Back
             </button>
           )}
-          <button type="submit">{isLastStep ? "Create Order" : "Next"}</button>
+          {!isLastStep && (
+            <button onClick={handleNext} type="button">
+              Next
+            </button>
+          )}
+          {isLastStep && <button type="submit">Create Order</button>}
         </div>
       </form>
       <h1>{JSON.stringify(result)}</h1>

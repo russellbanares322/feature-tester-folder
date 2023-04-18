@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import { useEffect } from "react";
 import styles from "./styles.module.css";
 
 const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
@@ -8,6 +9,14 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
     handleChangeFields({ lastname: inputs.lastname });
     handleCloseModal();
   };
+
+  const inputResultRef = useRef();
+
+  useEffect(() => {
+    if (inputResultRef.current) {
+      inputResultRef.current.focus();
+    }
+  }, []);
 
   const handleAddEmail = (selectedEmail) => {
     handleChangeFields({ email: [...inputs.email, selectedEmail] });
@@ -59,7 +68,14 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
             type="email"
           />
           {input.includes("@") && input.length > 6 && (
-            <p onClick={() => handleAddEmail(input)}>{input}</p>
+            <input
+              className={styles.result}
+              ref={inputResultRef}
+              onClick={() => handleAddEmail(input)}
+              value={input}
+              autoFocus
+              readOnly
+            />
           )}
         </div>
       </div>

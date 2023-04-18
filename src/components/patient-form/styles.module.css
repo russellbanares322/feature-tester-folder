@@ -19,3 +19,15 @@
   height: 15rem;
   width: auto;
 }
+.result {
+  appearance: none;
+  border: none;
+  outline: none;
+}
+.result:focus {
+  background: red;
+}
+.result:hover {
+  background-color: gray;
+  cursor: pointer;
+}
