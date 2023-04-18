@@ -28,7 +28,7 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
       }
     }
     if (inputs.email.includes(input)) {
-      return alert(`${input} is already added, try a new one!`);
+      return setError(`${input} is already added, try a new one!`);
     }
   };
   const isValid = (value) => {
