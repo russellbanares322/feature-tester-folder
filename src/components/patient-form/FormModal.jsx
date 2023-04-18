@@ -16,7 +16,7 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
     setInput("");
   };
   const handleEnterEmail = (e) => {
-    if (["Enter"].includes(e.key)) {
+    if (e.key === "Enter") {
       e.preventDefault();
 
       let email = e.target.value.trim();
@@ -98,7 +98,11 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
           Add
         </button>
         <br />
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div
+          onKeyDown={handleEnterEmail}
+          tabIndex={1}
+          style={{ display: "flex", flexDirection: "column" }}
+        >
           {inputs?.email?.map((m, index) => (
             <p
               style={{
@@ -122,7 +126,12 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
             type="email"
           />
           {input.includes("@") && input.length > 6 && (
-            <p onClick={handleAddEmail} className={styles.result}>
+            <p
+              tabIndex={0}
+              onClick={() => handleAddEmail(input)}
+              onKeyDown={() => console.log(input)}
+              className={styles.result}
+            >
               {input}
             </p>
           )}
