@@ -2,6 +2,10 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import FormContent from "./components/patient-form/FormContent";
 import AnotherTest from "./components/navbar/AnotherTest";
+import FirstSection from "./Grids/firstSection";
+import FStep from "./Grids/fStep";
+import { Grid } from "@mui/material";
+import SidePanel from "./Grids/sidePanel";
 
 function Entry({ entry, depth }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -81,8 +85,46 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <AnotherTest />
+    <div>
+      <Grid
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "start",
+          flexWrap: "wrap-reverse",
+          backgroundColor: "red",
+          maxHeight: "100%",
+          minHeight: "100%",
+          height: "100%",
+          border: "1px solid green",
+        }}
+        container
+      >
+        <Grid
+          sx={{ border: "1px solid pink" }}
+          xs={12}
+          sm={12}
+          md={12}
+          lg={9}
+          xl={9}
+          item
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              margin: "2rem 3rem",
+              borderRadius: "0.4rem",
+            }}
+          >
+            <FStep />
+          </div>
+        </Grid>
+        <Grid xs={12} sm={12} md={12} lg={3} xl={3} item>
+          <SidePanel />
+        </Grid>
+      </Grid>
+
+      {/* <AnotherTest />
       <FormContent />
       {/* <Form />
       <Search />
