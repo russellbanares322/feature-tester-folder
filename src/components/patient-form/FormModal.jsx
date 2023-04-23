@@ -1,4 +1,4 @@
-import { TextField } from "@mui/material";
+import { Chip, TextField } from "@mui/material";
 import React, { useState } from "react";
 import styles from "./styles.module.css";
 
@@ -106,56 +106,42 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
           Add
         </button>
         <br />
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <div
           onKeyDown={handleEnterEmail}
           tabIndex={1}
-          className={styles["email-input-wrapper"]}
+          className={styles["email-input"]}
         >
-          {inputs?.email?.map((m, index) => (
-            <p
-              style={{
-                backgroundColor: "greenyellow",
-                color: "white",
-                borderRadius: "4rem",
-                marginTop: "0.5rem",
-              }}
-              key={index}
-            >
-              {m}
-
-              <span onClick={() => handleRemove(m)}>X</span>
-            </p>
-          ))}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "start",
-              alignItems: "center",
-              flexDirection: "column",
-            }}
-          >
-            <TextField
-              size="small"
-              sx={{ border: "none", outline: "none", width: "5rem" }}
-              value={input}
-              onChange={handleChange}
-              onKeyDown={(e) => handleEnterEmail(e)}
-              onPaste={handlePaste}
-              type="email"
-            />
-            <div>
-              {input.includes("@") && input.length > 6 && (
-                <p
-                  tabIndex={0}
-                  onClick={() => handleAddEmail(input)}
-                  onKeyDown={() => console.log(input)}
-                  className={styles.result}
-                >
-                  {input}
-                </p>
-              )}
-              {error && <p style={{ color: "red" }}>{error}</p>}
-            </div>
+          <ul>
+            {inputs?.email?.map((em, index) => (
+              <li key={index}>
+                <Chip
+                  sx={{ fontSize: "1rem" }}
+                  label={em}
+                  onDelete={() => handleRemove(em)}
+                />
+              </li>
+            ))}
+          </ul>
+          <input
+            placeholder="Please input your email here"
+            value={input}
+            onChange={handleChange}
+            onKeyDown={(e) => handleEnterEmail(e)}
+            onPaste={handlePaste}
+            type="email"
+          />
+          <div className={styles["suggestion-wrapper"]}>
+            {input.includes("@") && input.length > 6 && (
+              <p
+                tabIndex={0}
+                onClick={() => handleAddEmail(input)}
+                onKeyDown={() => console.log(input)}
+                className={styles.result}
+              >
+                {input}
+              </p>
+            )}
           </div>
         </div>
       </div>

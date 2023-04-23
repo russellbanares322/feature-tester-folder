@@ -29,14 +29,42 @@
   cursor: pointer;
 }
 
-.email-input-wrapper {
+.email-input {
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   align-items: center;
   border: 1px solid #d3d3d3;
+  width: 100%;
   padding: 0.3rem 0.8rem;
   border-radius: 0.3rem;
+  flex-wrap: wrap;
+  position: relative;
 }
-.email-input-wrapper:focus {
+.email-input ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 1rem;
+}
+.email-input ul li {
+  width: auto;
+  padding: 0.2rem 0.3rem;
+}
+.email-input:focus-within {
   border: 1px solid blue;
+}
+
+.email-input input {
+  appearance: none;
+  border: none;
+  outline: none;
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.suggestion-wrapper {
+  position: absolute;
+  bottom: -19px;
+  left: 0;
+  width: inherit;
 }
