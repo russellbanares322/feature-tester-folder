@@ -1,9 +1,11 @@
+import { TextField } from "@mui/material";
 import React, { useState } from "react";
 import styles from "./styles.module.css";
 
 const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
+
   const handleSubmit = (e) => {
     e.preventDefault();
     handleChangeFields({ firstname: inputs.firstname });
@@ -26,6 +28,12 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
         });
         setInput("");
       }
+    }
+
+    if (input === "" && e.key === "Backspace" && inputs.email.length > 0) {
+      const newEmail = [...inputs.email];
+      newEmail.pop();
+      handleChangeFields({ email: newEmail });
     }
     if (inputs.email.includes(input)) {
       return setError(`${input} is already added, try a new one!`);
@@ -80,17 +88,17 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
   return (
     <div className={styles["modal-overlay"]}>
       <div className={styles["modal-content"]}>
-        <h5>{JSON.stringify(inputs.email)}</h5>
+        <h5>{JSON.stringify(inputs?.email)}</h5>
         <button type="button" onClick={handleCloseModal}>
           Close
         </button>
         <input
           type="text"
-          value={inputs.firstname}
+          value={inputs?.firstname}
           onChange={(e) => handleChangeFields({ firstname: e.target.value })}
         />
         <input
-          value={inputs.lastname}
+          value={inputs?.lastname}
           type="text"
           onChange={(e) => handleChangeFields({ lastname: e.target.value })}
         />
@@ -101,7 +109,7 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
         <div
           onKeyDown={handleEnterEmail}
           tabIndex={1}
-          style={{ display: "flex", flexDirection: "column" }}
+          className={styles["email-input-wrapper"]}
         >
           {inputs?.email?.map((m, index) => (
             <p
@@ -118,24 +126,37 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
               <span onClick={() => handleRemove(m)}>X</span>
             </p>
           ))}
-          <input
-            value={input}
-            onChange={handleChange}
-            onKeyDown={(e) => handleEnterEmail(e)}
-            onPaste={handlePaste}
-            type="email"
-          />
-          {input.includes("@") && input.length > 6 && (
-            <p
-              tabIndex={0}
-              onClick={() => handleAddEmail(input)}
-              onKeyDown={() => console.log(input)}
-              className={styles.result}
-            >
-              {input}
-            </p>
-          )}
-          {error && <p style={{ color: "red" }}>{error}</p>}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "start",
+              alignItems: "center",
+              flexDirection: "column",
+            }}
+          >
+            <TextField
+              size="small"
+              sx={{ border: "none", outline: "none", width: "5rem" }}
+              value={input}
+              onChange={handleChange}
+              onKeyDown={(e) => handleEnterEmail(e)}
+              onPaste={handlePaste}
+              type="email"
+            />
+            <div>
+              {input.includes("@") && input.length > 6 && (
+                <p
+                  tabIndex={0}
+                  onClick={() => handleAddEmail(input)}
+                  onKeyDown={() => console.log(input)}
+                  className={styles.result}
+                >
+                  {input}
+                </p>
+              )}
+              {error && <p style={{ color: "red" }}>{error}</p>}
+            </div>
+          </div>
         </div>
       </div>
     </div>

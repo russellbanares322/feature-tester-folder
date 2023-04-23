@@ -4,8 +4,9 @@ import FormContent from "./components/patient-form/FormContent";
 import AnotherTest from "./components/navbar/AnotherTest";
 import FirstSection from "./Grids/firstSection";
 import FStep from "./Grids/fStep";
-import { Grid } from "@mui/material";
+import { createTheme, Grid } from "@mui/material";
 import SidePanel from "./Grids/sidePanel";
+import FormModal from "./components/patient-form/FormModal";
 
 function Entry({ entry, depth }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -117,32 +118,30 @@ function App() {
             }}
           >
             <FStep />
+            <FormContent />
           </div>
         </Grid>
         <Grid xs={12} sm={12} md={12} lg={3} xl={3} item>
           <SidePanel />
         </Grid>
-      </Grid>
-
-      {/* <AnotherTest />
-      <FormContent />
-      {/* <Form />
-      <Search />
-      <div
-        style={{
-          marginTop: "4rem",
-          marginBottom: "4rem",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <div>
-          {files.children?.map((entry) => (
-            <Entry key={entry.id} entry={entry} depth={1} />
-          ))}
+        <AnotherTest />
+        <FormContent />
+        <div
+          style={{
+            marginTop: "4rem",
+            marginBottom: "4rem",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <div>
+            {files.children?.map((entry) => (
+              <Entry key={entry.id} entry={entry} depth={1} />
+            ))}
+          </div>
         </div>
-      </div> */}
+      </Grid>
     </div>
   );
 }

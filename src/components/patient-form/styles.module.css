@@ -17,7 +17,8 @@
   align-items: center;
   background-color: white;
   height: 15rem;
-  width: auto;
+  width: 30rem;
+  padding: 1rem;
 }
 .result {
   background-color: gray;
@@ -26,4 +27,16 @@
 .result:hover {
   background-color: rgb(160, 160, 160);
   cursor: pointer;
+}
+
+.email-input-wrapper {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  border: 1px solid #d3d3d3;
+  padding: 0.3rem 0.8rem;
+  border-radius: 0.3rem;
+}
+.email-input-wrapper:focus {
+  border: 1px solid blue;
 }

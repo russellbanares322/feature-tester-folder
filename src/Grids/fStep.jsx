@@ -8,13 +8,6 @@ const FStep = () => {
     <Box sx={{ flexGrow: 1 }} p={4}>
       <FirstSection />
       <SecondSection />
-      <SecondSection />
-      <SecondSection />
-      <SecondSection />
-      <SecondSection />
-      <SecondSection />
-      <SecondSection />
-      <SecondSection />
     </Box>
   );
 };
