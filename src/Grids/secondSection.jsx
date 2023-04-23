@@ -5,6 +5,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import AccessAlarmsIcon from "@mui/icons-material/AccessAlarms";
+import { DatePicker } from "@mui/x-date-pickers";
 
 const SecondSection = () => {
   return (
@@ -60,15 +61,22 @@ const SecondSection = () => {
             sx={{
               position: "relative",
               "::after": {
-                content: <AccessAlarmsIcon />,
+                content: '"🕓"',
                 position: "absolute",
                 right: 11,
                 top: 16,
+                pointerEvents: "none",
+                cursor: "pointer",
               },
             }}
           />
         </DemoContainer>
       </LocalizationProvider> */}
+      <TextField type="time" />
+      <TextField type="date" />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DatePicker />
+      </LocalizationProvider>
       <table>
         <thead>
           <th>No.</th>
