@@ -1,4 +1,4 @@
-import { Chip, TextField } from "@mui/material";
+import { Chip } from "@mui/material";
 import React, { useState } from "react";
 import styles from "./styles.module.css";
 
@@ -14,6 +14,9 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
   };
 
   const handleAddEmail = (selectedEmail) => {
+    if (inputs.email.length === 2) {
+      return;
+    }
     handleChangeFields({ email: [...inputs.email, selectedEmail] });
     setInput("");
   };
@@ -37,6 +40,9 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
     }
     if (inputs.email.includes(input)) {
       return setError(`${input} is already added, try a new one!`);
+    }
+    if (inputs.email.length === 2) {
+      return;
     }
   };
   const isValid = (value) => {
@@ -124,7 +130,7 @@ const FormModal = ({ handleCloseModal, inputs, handleChangeFields }) => {
             ))}
           </ul>
           <input
-            placeholder="Please input your email here"
+            placeholder="Input your email"
             value={input}
             onChange={handleChange}
             onKeyDown={(e) => handleEnterEmail(e)}
