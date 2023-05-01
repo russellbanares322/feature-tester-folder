@@ -1,3 +1,4 @@
+import { Box, Button, TextField } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useMultiStepForm } from "../../hooks/useMultiStepForm";
 import FirstStepForm from "./FirstStepForm";
@@ -66,6 +67,46 @@ const FormContent = () => {
     };
   }, [isDirty]);
 
+  const [input, setInput] = useState({
+    name: "",
+    address: "",
+  });
+  const [inputErr, setInputErr] = useState({
+    nameErr: false,
+    addressErr: false,
+  });
+
+  const handleChange = (e) => {
+    setInput({ ...input, [e.target.name]: e.target.value });
+    if (input.name.length > 0) {
+      setInputErr({
+        ...inputErr,
+        nameErr: false,
+      });
+    }
+    if (input.address.length > 0) {
+      setInputErr({
+        ...inputErr,
+        addressErr: false,
+      });
+    }
+  };
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    if (!input.name) {
+      return setInputErr({
+        nameErr: true,
+      });
+    }
+    if (!input.address) {
+      return setInputErr({
+        addressErr: true,
+      });
+    }
+    console.log(input);
+  };
+
   return (
     <div
       style={{
@@ -78,6 +119,25 @@ const FormContent = () => {
         flexWrap: "wrap-reverse",
       }}
     >
+      <Box onSubmit={onSubmit} component="form">
+        <TextField
+          error={inputErr.nameErr}
+          onChange={handleChange}
+          type="text"
+          label="name"
+          helperText={inputErr.nameErr && "Name is required"}
+        />
+        <TextField
+          error={inputErr.addressErr}
+          onChange={handleChange}
+          type="text"
+          label="address"
+          helperText={inputErr.addressErr && "Address is required"}
+        />
+        <Button type="submit" variant="contained">
+          Submit
+        </Button>
+      </Box>
       <form
         style={{
           border: "1px solid red",
