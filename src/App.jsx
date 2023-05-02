@@ -94,13 +94,16 @@ function App() {
       xRed: {
         main: "#F15757",
       },
+      incognitoGray: {
+        main: "#DADCE0",
+      },
     },
   });
   return (
     <ThemeProvider theme={theme}>
       <Dboard />
       <div>
-        <Typography color={theme.palette.xRed} variant="h1">
+        <Typography sx={{ color: "incognitoGray.main" }} variant="h1">
           Test
         </Typography>
         <Grid
