@@ -7,6 +7,7 @@ import {
   MenuItem,
   FormControl,
   Button,
+  Typography,
 } from "@mui/material";
 import React from "react";
 import { useState } from "react";
@@ -20,6 +21,24 @@ const Dboard = () => {
     barangayId: 0,
     streetName: "",
   });
+
+  const dummy = [
+    {
+      no: 1,
+      code: 1001,
+      specimenType: "Serum",
+    },
+    {
+      no: 2,
+      code: 1002,
+      specimenType: "Hepi",
+    },
+    {
+      no: 3,
+      code: 1003,
+      specimenType: "EDTA / Taruby",
+    },
+  ];
   const [phAddresses, setPhAddresses] = useState([
     {
       id: 16,
@@ -172,6 +191,40 @@ const Dboard = () => {
           }}
         ></Box>
       </Grid>
+
+      <Box>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "9fr 30fr 30fr",
+          }}
+        >
+          <Typography variant="p">No</Typography>
+          <Typography variant="p">Code</Typography>
+          <Typography variant="p">Specimen Type</Typography>
+        </Box>
+        <Box
+          sx={{
+            border: "1px solid red",
+            borderRadius: "0.5rem",
+            padding: "0.2rem",
+          }}
+        >
+          {dummy.map((a) => (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "9fr 30fr 30fr",
+              }}
+              key={a.no}
+            >
+              <Typography variant="p">{a.no}</Typography>
+              <Typography variant="p">{a.code}</Typography>
+              <Typography variant="p">{a.specimenType}</Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
     </Grid>
   );
 };
