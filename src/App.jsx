@@ -8,6 +8,7 @@ import { createTheme, Grid, ThemeProvider, Typography } from "@mui/material";
 import SidePanel from "./Grids/sidePanel";
 import FormModal from "./components/patient-form/FormModal";
 import Dboard from "./Grids/Dboard";
+import AutoComplete from "./Grids/AutoComplete";
 
 function Entry({ entry, depth }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -101,6 +102,7 @@ function App() {
   });
   return (
     <ThemeProvider theme={theme}>
+      <AutoComplete />
       <Dboard />
       <div>
         <Typography sx={{ color: "incognitoGray.main" }} variant="h1">
