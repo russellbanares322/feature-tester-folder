@@ -103,6 +103,8 @@ const AutoComplete = () => {
         Prev
       </Button>
       {JSON.stringify(codesArr)}
+
+      {/* IMPLEMENTATION OF ADDING DATA INSIDE TABLE */}
       {step === 2 && (
         <Box>
           <h1 color="white">{movieYear}</h1>
