@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useState } from "react";
-import Autocomplete from "../Grids/Autocomplete";
+import Autocomplete from "./AutoComplete";
 
 const Dboard = () => {
   const [selectedAddressId, setSelectedAddressId] = useState(null);
@@ -192,40 +192,6 @@ const Dboard = () => {
           }}
         ></Box>
       </Grid>
-
-      <Box>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "9fr 30fr 30fr",
-          }}
-        >
-          <Typography variant="p">No</Typography>
-          <Typography variant="p">Code</Typography>
-          <Typography variant="p">Specimen Type</Typography>
-        </Box>
-        <Box
-          sx={{
-            border: "1px solid red",
-            borderRadius: "0.5rem",
-            padding: "0.2rem",
-          }}
-        >
-          {dummy.map((a) => (
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "9fr 30fr 30fr",
-              }}
-              key={a.no}
-            >
-              <Typography variant="p">{a.no}</Typography>
-              <Typography variant="p">{a.code}</Typography>
-              <Typography variant="p">{a.specimenType}</Typography>
-            </Box>
-          ))}
-        </Box>
-      </Box>
     </Grid>
   );
 };
