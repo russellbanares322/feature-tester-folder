@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Autocomplete,
   Box,
@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import Dboard from "./Dboard";
-const codeOptions = [
+const codes = [
   { id: 1, code: "testing A" },
   { id: 2, code: "testing B" },
   { id: 3, code: "testing C" },
@@ -16,6 +16,8 @@ const codeOptions = [
 
 const AutoComplete = () => {
   const [step, setStep] = useState(1);
+  const [codeOptions, setCodeOptions] = useState(codes);
+  const codesRef = useRef();
 
   const handleNext = (e) => {
     e.preventDefault();
@@ -70,7 +72,19 @@ const AutoComplete = () => {
 
   const handleChange = (e) => {
     setCodeInputs({ code: e.target.value });
-    console.log(codeInputs.code);
+  };
+
+  const handleAddCodeInDropdown = (e) => {
+    if (e.key === "Enter") {
+      setCodeOptions([
+        ...codeOptions,
+        { id: Math.random(), code: codeInputs.code },
+      ]);
+      codesRef.current.value.reset();
+      setCodeInputs({
+        code: "",
+      });
+    }
   };
   return (
     <div
@@ -172,7 +186,34 @@ const AutoComplete = () => {
           </Box>
         </Box>
       )}
-      {step === 1 && <Dboard />}
+      {step === 1 && (
+        <Box>
+          {JSON.stringify(codeOptions)}
+          <Autocomplete
+            getOptionLabel={(option) =>
+              option.id && option.code ? `${option.code}` : ""
+            }
+            onChange={(event, newInputValue) => {
+              handleSelectCode(newInputValue);
+            }}
+            ref={codesRef}
+            id="combo-box-demo"
+            options={codeOptions}
+            sx={{ width: 300, backgroundColor: "white" }}
+            onKeyDown={(e) => handleAddCodeInDropdown(e)}
+            renderInput={(params) => (
+              <TextField
+                ref={codesRef}
+                value={codeInputs.code}
+                onKeyDown={(e) => handleAddCodeInDropdown(e)}
+                onChange={(e) => setCodeInputs({ code: e.target.value })}
+                {...params}
+                placeholder="New Code"
+              />
+            )}
+          />
+        </Box>
+      )}
     </div>
   );
 };
