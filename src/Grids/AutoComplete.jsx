@@ -3,10 +3,10 @@ import {
   Autocomplete,
   Box,
   Button,
+  createFilterOptions,
   TextField,
   Typography,
 } from "@mui/material";
-import Dboard from "./Dboard";
 const codes = [
   { id: 1, code: "testing A" },
   { id: 2, code: "testing B" },
@@ -14,9 +14,12 @@ const codes = [
   { id: 4, code: "testing D" },
 ];
 
+const filter = createFilterOptions();
+
 const AutoComplete = () => {
   const [step, setStep] = useState(1);
   const [codeOptions, setCodeOptions] = useState(codes);
+  const [value, setValue] = useState(null);
 
   const handleNext = (e) => {
     e.preventDefault();
@@ -27,19 +30,40 @@ const AutoComplete = () => {
     e.preventDefault();
     setStep((prevStep) => Math.max(1, prevStep - 1));
   };
-  const [movieYear, setMovieYear] = useState(null);
   const [codeInputs, setCodeInputs] = useState({
     id: Math.random(),
     code: "",
   });
   const [codesArr, setCodesArr] = useState([]);
   const [selectedCodeId, setSelectedCodeId] = useState(null);
-  const handleSelectCode = (selectedCode) => {
+
+  const handleSelectCode = (event, selectedCode) => {
+    if (event.key !== "Enter") {
+      setCodesArr([
+        ...codesArr,
+        { id: selectedCode.id, code: selectedCode.code },
+      ]);
+      setValue(null);
+    }
+    setCodeInputs({
+      code: "",
+    });
+  };
+
+  const handleSelectCodeFromDropdown = (selectedCode) => {
     setCodesArr([...codesArr, selectedCode]);
+    if (codesArr.includes(selectedCode)) {
+      alert(`${selectedCode.code} is already on the list!`);
+    }
   };
 
   const handleEnterCode = (e) => {
-    if (e.key === "Enter" && selectedCodeId === null) {
+    const codeName = codesArr.map((c) => c.code);
+    if (
+      e.key === "Enter" &&
+      selectedCodeId === null &&
+      !codeName.includes(codeInputs.code)
+    ) {
       setCodesArr([...codesArr, { id: Math.random(), code: codeInputs.code }]);
       setCodeInputs({
         id: 0,
@@ -58,6 +82,10 @@ const AutoComplete = () => {
         id: 0,
         code: "",
       });
+    }
+
+    if (codeName.includes(codeInputs.code)) {
+      return alert(`${codeInputs.code} is already in the list.`);
     }
   };
 
@@ -81,7 +109,13 @@ const AutoComplete = () => {
       setCodeInputs({
         code: "",
       });
+      setValue(null);
     }
+  };
+
+  const handleDeleteDataFromTable = (selectedId) => {
+    const filteredCodesArr = codesArr.filter((c) => c.id !== selectedId);
+    setCodesArr(filteredCodesArr);
   };
 
   return (
@@ -114,25 +148,99 @@ const AutoComplete = () => {
       >
         Prev
       </Button>
+      <h1>Mini table data</h1>
       {JSON.stringify(codesArr)}
+      <h1>Select options data</h1>
+      {JSON.stringify(codeOptions)}
+
+      {/* IMPLEMENTATION OF POSTING CUSTOM DATA IN API */}
+      {step === 1 && (
+        <Box>
+          <Autocomplete
+            selectOnFocus
+            clearOnBlur
+            freeSolo
+            disableClearable
+            getOptionLabel={(option) => {
+              if (option.id && option.code) {
+                return `${option.code}`;
+              }
+
+              if (typeof option === "string") {
+                return option;
+              }
+
+              if (option.inputValue) {
+                return option.inputValue;
+              }
+
+              return option.code;
+            }}
+            onChange={(event, newInputValue) => {
+              handleSelectCode(event, newInputValue);
+              if (typeof newInputValue === "string") {
+                setValue({
+                  code: newInputValue,
+                });
+              } else if (newInputValue && newInputValue.inputValue) {
+                // Create a new value from the user input
+                setValue({
+                  code: newInputValue.inputValue,
+                });
+              } else {
+                setValue(newInputValue);
+              }
+            }}
+            options={codeOptions}
+            sx={{ width: 300, backgroundColor: "white" }}
+            filterOptions={(options, params) => {
+              const filtered = filter(options, params);
+
+              const { inputValue } = params;
+              // Suggest the creation of a new value
+              const isExisting = options.some(
+                (option) => inputValue === option.code
+              );
+              if (inputValue !== "" && !isExisting) {
+                filtered.push({
+                  inputValue,
+                  code: `Add "${inputValue}"`,
+                });
+              }
+
+              return filtered;
+            }}
+            renderOption={(props, option) => <li {...props}>{option.code}</li>}
+            renderInput={(params) => (
+              <TextField
+                name="code"
+                value={codeInputs.code}
+                onKeyDown={(e) => handleAddCodeInDropdown(e)}
+                onChange={handleChange}
+                {...params}
+                placeholder="Add code in dropdown"
+              />
+            )}
+          />
+        </Box>
+      )}
 
       {/* IMPLEMENTATION OF ADDING DATA INSIDE TABLE */}
       {step === 2 && (
         <Box>
-          <h1 color="white">{movieYear}</h1>
           <Autocomplete
             disableClearable
             getOptionLabel={(option) =>
               option.id && option.code ? `${option.code}` : ""
             }
             onChange={(event, newInputValue) => {
-              handleSelectCode(newInputValue);
+              handleSelectCodeFromDropdown(newInputValue);
             }}
             id="combo-box-demo"
             options={codeOptions}
             sx={{ width: 300, backgroundColor: "white" }}
             renderInput={(params) => (
-              <TextField {...params} placeholder="Province" />
+              <TextField {...params} placeholder="Add data in table" />
             )}
           />
           <TextField
@@ -178,39 +286,13 @@ const AutoComplete = () => {
                   >
                     <Typography variant="p">{index + 1}</Typography>
                     <Typography variant="p">{a.code}</Typography>
+                    <p onClick={() => handleDeleteDataFromTable(a.id)}>
+                      Delete
+                    </p>
                   </Box>
                 ))}
             </Box>
           </Box>
-        </Box>
-      )}
-      {step === 1 && (
-        <Box>
-          {JSON.stringify(codeOptions)}
-          <Autocomplete
-            freeSolo
-            disableClearable
-            getOptionLabel={(option) =>
-              option.id && option.code ? `${option.code}` : ""
-            }
-            onChange={(event, newInputValue) => {
-              handleSelectCode(newInputValue);
-            }}
-            id="combo-box-demo"
-            options={codeOptions}
-            sx={{ width: 300, backgroundColor: "white" }}
-            onKeyDown={(e) => handleAddCodeInDropdown(e)}
-            renderInput={(params) => (
-              <TextField
-                name="code"
-                value={codeInputs.code}
-                onKeyDown={(e) => handleAddCodeInDropdown(e)}
-                onChange={handleChange}
-                {...params}
-                placeholder="New Code"
-              />
-            )}
-          />
         </Box>
       )}
     </div>
