@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
   Autocomplete,
   Box,
@@ -17,7 +17,6 @@ const codes = [
 const AutoComplete = () => {
   const [step, setStep] = useState(1);
   const [codeOptions, setCodeOptions] = useState(codes);
-  const codesRef = useRef();
 
   const handleNext = (e) => {
     e.preventDefault();
@@ -39,7 +38,6 @@ const AutoComplete = () => {
     setCodesArr([...codesArr, selectedCode]);
   };
 
-  console.log(selectedCodeId);
   const handleEnterCode = (e) => {
     if (e.key === "Enter" && selectedCodeId === null) {
       setCodesArr([...codesArr, { id: Math.random(), code: codeInputs.code }]);
@@ -80,12 +78,12 @@ const AutoComplete = () => {
         ...codeOptions,
         { id: Math.random(), code: codeInputs.code },
       ]);
-      codesRef.current.value.reset();
       setCodeInputs({
         code: "",
       });
     }
   };
+
   return (
     <div
       style={{
@@ -190,23 +188,24 @@ const AutoComplete = () => {
         <Box>
           {JSON.stringify(codeOptions)}
           <Autocomplete
+            freeSolo
+            disableClearable
             getOptionLabel={(option) =>
               option.id && option.code ? `${option.code}` : ""
             }
             onChange={(event, newInputValue) => {
               handleSelectCode(newInputValue);
             }}
-            ref={codesRef}
             id="combo-box-demo"
             options={codeOptions}
             sx={{ width: 300, backgroundColor: "white" }}
             onKeyDown={(e) => handleAddCodeInDropdown(e)}
             renderInput={(params) => (
               <TextField
-                ref={codesRef}
+                name="code"
                 value={codeInputs.code}
                 onKeyDown={(e) => handleAddCodeInDropdown(e)}
-                onChange={(e) => setCodeInputs({ code: e.target.value })}
+                onChange={handleChange}
                 {...params}
                 placeholder="New Code"
               />
