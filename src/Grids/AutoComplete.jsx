@@ -65,13 +65,15 @@ const AutoComplete = () => {
     if (
       e.key === "Enter" &&
       selectedCodeId === null &&
-      !codeName.includes(codeInputs.code)
+      !codeName.includes(codeInputs.code) &&
+      codeInputs.code !== ""
     ) {
       setCodesArr([...codesArr, { id: Math.random(), code: codeInputs.code }]);
       setCodeInputs({
         id: 0,
         code: "",
       });
+      e.preventDefault();
     }
 
     if (e.key === "Enter" && selectedCodeId !== null) {
@@ -85,9 +87,10 @@ const AutoComplete = () => {
         id: 0,
         code: "",
       });
+      e.preventDefault();
     }
 
-    if (codeName.includes(codeInputs.code)) {
+    if (e.key === "Enter" && codeName.includes(codeInputs.code)) {
       return alert(`${codeInputs.code} is already in the list.`);
     }
   };
