@@ -50,10 +50,13 @@ const AutoComplete = () => {
     });
   };
 
+  //UPDATED VALIDATION
+
   const handleSelectCodeFromDropdown = (selectedCode) => {
-    setCodesArr([...codesArr, selectedCode]);
-    if (codesArr.includes(selectedCode)) {
-      alert(`${selectedCode.code} is already on the list!`);
+    if (!codesArr.includes(selectedCode)) {
+      return setCodesArr([...codesArr, selectedCode]);
+    } else {
+      alert(`${selectedCode.code} is already added`);
     }
   };
 
