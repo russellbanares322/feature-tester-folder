@@ -264,7 +264,7 @@ const AutoComplete = () => {
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: "9fr 30fr",
+                gridTemplateColumns: "minmax(4em, 20%) 1fr",
               }}
             >
               <Typography variant="p">No</Typography>
@@ -285,7 +285,7 @@ const AutoComplete = () => {
                   <Box
                     sx={{
                       display: "grid",
-                      gridTemplateColumns: "9fr 30fr",
+                      gridTemplateColumns: "minmax(4em, 20%) 1fr",
                     }}
                     key={a.id}
                     onDoubleClick={() => handleSelectCodeToEdit(a)}
