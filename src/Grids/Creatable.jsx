@@ -7,6 +7,7 @@ import {
   Box,
 } from "@mui/material";
 import React, { useState } from "react";
+import AddingData from "./AddingData";
 
 const codeData = [
   {
@@ -58,7 +59,7 @@ const Creatable = () => {
   };
   return (
     <div>
-      {JSON.stringify(addedCode)}
+      <AddingData />
       <Autocomplete
         disableClearable
         value={value}
