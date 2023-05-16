@@ -7,6 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import Creatable from "./Creatable";
 const codes = [
   { id: 1, code: "testing A" },
   { id: 2, code: "testing B" },
@@ -124,6 +125,23 @@ const AutoComplete = () => {
     setCodesArr(filteredCodesArr);
   };
 
+  const [pageNo, setPageNo] = useState(0);
+  const limit = 10;
+
+  const handleIncrement = () => {
+    setPageNo((prev) => prev + 3);
+    if (Math.abs(pageNo - limit)) {
+      setPageNo(limit);
+    }
+    if (pageNo === limit) {
+      return;
+    }
+  };
+  const handleDecrement = () => {
+    if (pageNo === 0) return;
+    setPageNo((prev) => prev - 3);
+  };
+
   return (
     <div
       style={{
@@ -136,6 +154,25 @@ const AutoComplete = () => {
         flexDirection: "column",
       }}
     >
+      <Creatable />
+      <h1 style={{ color: "green" }}>Limit: {limit}</h1>
+      <h1 style={{ color: "green" }}>PageNo: {pageNo}</h1>
+      <Button
+        onClick={handleIncrement}
+        type="button"
+        variant="contained"
+        color="primary"
+      >
+        +
+      </Button>
+      <Button
+        onClick={handleDecrement}
+        type="button"
+        variant="contained"
+        color="primary"
+      >
+        -
+      </Button>
       <h1 style={{ color: "red" }}>{step}</h1>
 
       <Button
