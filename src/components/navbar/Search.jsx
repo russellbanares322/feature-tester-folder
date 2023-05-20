@@ -25,6 +25,9 @@ const names = [
   },
 ];
 
+builder.addcase(state =>  {
+  fetchPatient.rejecte
+}) 
 const Search = () => {
   const [namesData, setNamesData] = useState(names);
   const [searchInput, setSearchInput] = useState("");

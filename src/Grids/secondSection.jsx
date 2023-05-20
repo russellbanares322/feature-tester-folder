@@ -8,6 +8,8 @@ import AccessAlarmsIcon from "@mui/icons-material/AccessAlarms";
 import { DatePicker } from "@mui/x-date-pickers";
 
 const SecondSection = () => {
+  
+
   return (
     <Grid rowSpacing={2} columnSpacing={4} sx={{ marginTop: 3 }} container>
       <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
