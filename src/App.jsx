@@ -9,6 +9,7 @@ import SidePanel from "./Grids/sidePanel";
 import FormModal from "./components/patient-form/FormModal";
 import Dboard from "./Grids/Dboard";
 import AutoComplete from "./Grids/AutoComplete";
+import DynamicInputs from "./Grids/DynamicInputs";
 
 function Entry({ entry, depth }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -102,6 +103,7 @@ function App() {
   });
   return (
     <ThemeProvider theme={theme}>
+      <DynamicInputs />
       <AutoComplete />
       <Dboard />
       <div>
