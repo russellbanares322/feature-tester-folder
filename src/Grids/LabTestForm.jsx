@@ -1,7 +1,7 @@
 import { Button, TextField } from "@mui/material";
 import React, { useState } from "react";
 
-const LabTestForm = ({ selectedLabTest }) => {
+const LabTestForm = ({ selectedLabTest, setTestInputArr, testInputArr }) => {
   const [formData, setFormData] = useState({});
   const [savedFormData, setSavedFormData] = useState([]);
 
@@ -13,6 +13,19 @@ const LabTestForm = ({ selectedLabTest }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (handleValidateForm()) {
+      if (selectedLabTest.specimenType === "fsh") {
+        setTestInputArr((prev) => ({
+          ...prev,
+          fshTest: [...testInputArr.fshTest, formData],
+        }));
+      }
+      if (selectedLabTest.specimenType === "adeptonic") {
+        setTestInputArr((prev) => ({
+          ...prev,
+          adeptonic: [...testInputArr.adeptonic, formData],
+        }));
+      }
+
       setSavedFormData(formData);
       setFormData({});
     } else {

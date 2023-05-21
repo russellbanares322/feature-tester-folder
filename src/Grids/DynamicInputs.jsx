@@ -7,12 +7,23 @@ const DynamicInputs = () => {
   const [profileOptions] = useState(testProfiles);
   const [selectedLabTest, setSelectedLabTest] = useState(null);
   const [openFormModal, setOpenFormModal] = useState(false);
+  const [testInputArr, setTestInputArr] = useState({
+    fshTest: [],
+    adeptonic: [],
+  });
 
   const handleSelectProfile = (selectedTestProfile) => {
     const hasAdditionalInfo = selectedTestProfile.hasAdditionalInfo;
     if (hasAdditionalInfo) {
-      setOpenFormModal(true);
-      setSelectedLabTest(selectedTestProfile);
+      if (
+        testInputArr.fshTest.length === 0 ||
+        testInputArr.adeptonic.length === 0
+      ) {
+        setOpenFormModal(true);
+        setSelectedLabTest(selectedTestProfile);
+      } else {
+        return;
+      }
     } else {
       return;
     }
@@ -24,6 +35,7 @@ const DynamicInputs = () => {
   };
   return (
     <div>
+      <pre>{JSON.stringify(testInputArr)}</pre>
       <h1>Dynamic Inputs</h1>
       <Autocomplete
         disableClearable
@@ -45,7 +57,11 @@ const DynamicInputs = () => {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <LabTestForm selectedLabTest={selectedLabTest} />
+        <LabTestForm
+          testInputArr={testInputArr}
+          setTestInputArr={setTestInputArr}
+          selectedLabTest={selectedLabTest}
+        />
       </Dialog>
       <hr />
     </div>

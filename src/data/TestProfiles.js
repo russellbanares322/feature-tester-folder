@@ -3,7 +3,7 @@ export const testProfiles = [
     id: 1,
     code: 1001,
     displayName: "001 - Test abc",
-    specimenType: "test",
+    specimenType: "adeptonic",
     hasAdditionalInfo: true,
     additionalInformation: [
       {
@@ -28,7 +28,7 @@ export const testProfiles = [
     id: 2,
     code: 1002,
     displayName: "002 - Test abc",
-    specimenType: "test",
+    specimenType: "fsh",
     hasAdditionalInfo: true,
     additionalInformation: [
       {
