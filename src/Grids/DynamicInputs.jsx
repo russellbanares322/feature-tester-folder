@@ -6,7 +6,11 @@ import LabTestForm from "./LabTestForm";
 const DynamicInputs = () => {
   const [profileOptions] = useState(testProfiles);
   const [selectedLabTest, setSelectedLabTest] = useState(null);
-  const [openFormModal, setOpenFormModal] = useState(false);
+  const [openFormModal, setOpenFormModal] = useState({
+    fshTest: false,
+    adeptonic: false,
+  });
+
   const [testInputArr, setTestInputArr] = useState({
     fshTest: [],
     adeptonic: [],
@@ -16,13 +20,25 @@ const DynamicInputs = () => {
     const hasAdditionalInfo = selectedTestProfile.hasAdditionalInfo;
     if (hasAdditionalInfo) {
       if (
-        testInputArr.fshTest.length === 0 ||
-        testInputArr.adeptonic.length === 0
+        testInputArr.fshTest.length === 0 &&
+        selectedTestProfile.specimenType === "fsh"
       ) {
-        setOpenFormModal(true);
+        setOpenFormModal((prev) => ({
+          ...prev,
+          fshTest: true,
+        }));
         setSelectedLabTest(selectedTestProfile);
-      } else {
-        return;
+      }
+
+      if (
+        testInputArr.adeptonic.length === 0 &&
+        selectedTestProfile.specimenType === "adeptonic"
+      ) {
+        setOpenFormModal((prev) => ({
+          ...prev,
+          adeptonic: true,
+        }));
+        setSelectedLabTest(selectedTestProfile);
       }
     } else {
       return;
@@ -30,12 +46,24 @@ const DynamicInputs = () => {
   };
 
   const handleCloseModal = () => {
-    setOpenFormModal(false);
+    if (openFormModal.fshTest) {
+      setOpenFormModal((prev) => ({
+        ...prev,
+        fshTest: false,
+      }));
+    }
+    if (openFormModal.adeptonic) {
+      setOpenFormModal((prev) => ({
+        ...prev,
+        adeptonic: false,
+      }));
+    }
     setSelectedLabTest(null);
   };
   return (
     <div>
       <pre>{JSON.stringify(testInputArr)}</pre>
+      {JSON.stringify(openFormModal)}
       <h1>Dynamic Inputs</h1>
       <Autocomplete
         disableClearable
@@ -52,15 +80,26 @@ const DynamicInputs = () => {
       />
 
       <Dialog
-        open={openFormModal}
+        open={openFormModal.fshTest && testInputArr.fshTest.length === 0}
         onClose={handleCloseModal}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
       >
         <LabTestForm
           testInputArr={testInputArr}
           setTestInputArr={setTestInputArr}
           selectedLabTest={selectedLabTest}
+          setOpenFormModal={setOpenFormModal}
+        />
+      </Dialog>
+
+      <Dialog
+        open={openFormModal.adeptonic && testInputArr.adeptonic.length === 0}
+        onClose={handleCloseModal}
+      >
+        <LabTestForm
+          testInputArr={testInputArr}
+          setTestInputArr={setTestInputArr}
+          selectedLabTest={selectedLabTest}
+          setOpenFormModal={setOpenFormModal}
         />
       </Dialog>
       <hr />

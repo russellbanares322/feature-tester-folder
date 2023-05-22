@@ -1,7 +1,12 @@
 import { Button, TextField } from "@mui/material";
 import React, { useState } from "react";
 
-const LabTestForm = ({ selectedLabTest, setTestInputArr, testInputArr }) => {
+const LabTestForm = ({
+  selectedLabTest,
+  setTestInputArr,
+  testInputArr,
+  setOpenFormModal,
+}) => {
   const [formData, setFormData] = useState({});
   const [savedFormData, setSavedFormData] = useState([]);
 
@@ -18,11 +23,19 @@ const LabTestForm = ({ selectedLabTest, setTestInputArr, testInputArr }) => {
           ...prev,
           fshTest: [...testInputArr.fshTest, formData],
         }));
+        setOpenFormModal((prev) => ({
+          ...prev,
+          fshTest: false,
+        }));
       }
       if (selectedLabTest.specimenType === "adeptonic") {
         setTestInputArr((prev) => ({
           ...prev,
           adeptonic: [...testInputArr.adeptonic, formData],
+        }));
+        setOpenFormModal((prev) => ({
+          ...prev,
+          adeptonic: false,
         }));
       }
 
@@ -40,9 +53,6 @@ const LabTestForm = ({ selectedLabTest, setTestInputArr, testInputArr }) => {
       return true;
     }
   };
-  console.log(handleValidateForm());
-
-  console.log(savedFormData);
   return (
     <div>
       {JSON.stringify(savedFormData)}
