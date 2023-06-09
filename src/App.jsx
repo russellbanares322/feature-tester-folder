@@ -15,6 +15,7 @@ import OrderDataLayout from "./Grids/OrderDataLayout";
 import AntDesignRecursive from "./Grids/AntDesignRecursive";
 import Ldboard from "./Grids/Ldboard";
 import FilterData from "./Grids/FilterData";
+import NestedArrUpdate from "./NestedArrUpdate/NestedArrUpdate";
 
 function Entry({ entry, depth }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -112,6 +113,10 @@ function App() {
         <Route path="/ldboard" element={<Ldboard />} />
       </Routes>
       <ThemeProvider theme={theme}>
+        <NestedArrUpdate />
+        <hr />
+        <hr />
+        <hr />
         <FilterData />
         <hr />
         <AntDesignRecursive />
