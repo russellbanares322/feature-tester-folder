@@ -14,6 +14,7 @@ const NestedArrUpdate = () => {
   });
   const [savedOptionData, setSavedOptionData] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [isForEdit, setIsForEdit] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [inputValues, setInputValues] = useState([]);
   const dropdownOptions = [
@@ -101,32 +102,91 @@ const NestedArrUpdate = () => {
     }
   };
 
+  const handleSelectOptionToEdit = (value) => {
+    setIsForEdit(true);
+    setInputValues(
+      value.additionalReq.map((req) => {
+        const existingData = savedOptions.testOrderDetails
+          .find((detail) => detail.testId === value.id)
+          ?.patientTestRequirementDatas[0]?.patientRequirementDataDetails.find(
+            (data) => data.patientTestRequirementDataId === req.id
+          );
+        return {
+          id: req.id,
+          value: existingData ? existingData.dataValue : "",
+        };
+      })
+    );
+    setSelectedOption(value);
+  };
+
   const handleCancel = () => {
     setShowModal(false);
+    setIsForEdit(false);
   };
 
   const handleOk = () => {
-    setSavedOptionData([...savedOptionData, selectedOption]);
-    setSavedOptions({
-      ...savedOptions,
-      testOrderDetails: [
-        ...savedOptions.testOrderDetails,
-        {
-          testId: selectedOption.id,
-          status: "Ordered",
-          patientTestRequirementDatas: [
-            {
-              testOrderDetailId: selectedOption.id,
-              patientRequirementDataDetails: inputValues.map((input) => ({
-                patientTestRequirementDataId: input.id,
-                dataKey: input.id,
-                dataValue: input.value,
-              })),
-            },
-          ],
-        },
-      ],
-    });
+    if (isForEdit) {
+      const updatedTestOrderDetails = savedOptions.testOrderDetails.map(
+        (detail) => {
+          if (detail.testId === selectedOption.id) {
+            const updatedPatientRequirementDataDetails =
+              detail.patientTestRequirementDatas[0]?.patientRequirementDataDetails.map(
+                (data) => {
+                  const updatedValue = inputValues.find(
+                    (input) => input.id === data.patientTestRequirementDataId
+                  )?.value;
+                  return {
+                    ...data,
+                    dataValue: updatedValue || data.dataValue,
+                  };
+                }
+              );
+
+            return {
+              ...detail,
+              patientTestRequirementDatas: [
+                {
+                  ...detail.patientTestRequirementDatas[0],
+                  patientRequirementDataDetails:
+                    updatedPatientRequirementDataDetails,
+                },
+              ],
+            };
+          }
+          return detail;
+        }
+      );
+
+      setSavedOptions({
+        ...savedOptions,
+        testOrderDetails: updatedTestOrderDetails,
+      });
+    } else {
+      setSavedOptionData([...savedOptionData, selectedOption]);
+      setSavedOptions({
+        ...savedOptions,
+        testOrderDetails: [
+          ...savedOptions.testOrderDetails,
+          {
+            testId: selectedOption.id,
+            status: "Ordered",
+            patientTestRequirementDatas: [
+              {
+                testOrderDetailId: selectedOption.id,
+                patientRequirementDataDetails: inputValues.map((input) => ({
+                  patientTestRequirementDataId: input.id,
+                  dataKey: input.id,
+                  dataValue: input.value,
+                })),
+              },
+            ],
+          },
+        ],
+      });
+    }
+
+    setIsForEdit(false);
     setShowModal(false);
   };
 
@@ -157,6 +217,7 @@ const NestedArrUpdate = () => {
         {savedOptionData.length > 0 &&
           savedOptionData.map((option) => (
             <div
+              onClick={() => handleSelectOptionToEdit(option)}
               style={{
                 backgroundColor: "gray",
                 cursor: "pointer",
@@ -173,7 +234,7 @@ const NestedArrUpdate = () => {
       </div>
       <Modal
         title="Dynamic Form"
-        open={showModal}
+        open={showModal || isForEdit}
         onOk={handleOk}
         okButtonProps={{
           disabled: isButtonDisabled,
