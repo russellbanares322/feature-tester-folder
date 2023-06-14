@@ -1,9 +1,33 @@
 import { Autocomplete, TextField } from "@mui/material";
 import { Box } from "@mui/system";
-import { Modal } from "antd";
+import { Button, Modal } from "antd";
 import React, { useState } from "react";
 
+const specimens = [
+  {
+    specimenType: "Specimen A",
+    quantity: 1,
+  },
+  {
+    specimenType: "Specimen B",
+    quantity: 3,
+  },
+  {
+    specimenType: "Specimen C",
+    quantity: 5,
+  },
+  {
+    specimenType: "Specimen D",
+    quantity: 1,
+  },
+  {
+    specimenType: "Specimen E",
+    quantity: 1,
+  },
+];
+
 const NestedArrUpdate = () => {
+  const [specimenData, setSpecimenData] = useState(specimens);
   const [savedOptions, setSavedOptions] = useState({
     clientId: 12345,
     patientId: 0,
@@ -17,6 +41,7 @@ const NestedArrUpdate = () => {
   const [isForEdit, setIsForEdit] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [inputValues, setInputValues] = useState([]);
+
   const dropdownOptions = [
     {
       id: 1,
@@ -194,12 +219,65 @@ const NestedArrUpdate = () => {
     (req) =>
       req.isRequired && !inputValues.find((value) => value.id === req.id)?.value
   );
+
+  const [prevValue, setPrevValue] = useState(1);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Delete" || e.key === "Backspace") {
+      event.preventDefault(); // Cancel the delete action
+    }
+  };
+  const handleChangeQuantity = (e, specimenType) => {
+    const currentValue = Number(e.target.value);
+    if (currentValue < 1) return;
+    if (currentValue < prevValue) {
+      setSpecimenData((prevSpecimens) =>
+        prevSpecimens.map((specimen) =>
+          specimen.specimenType === specimenType
+            ? {
+                ...specimen,
+                quantity: specimen.quantity - 1,
+              }
+            : specimen
+        )
+      );
+    } else {
+      setSpecimenData((prevSpecimens) =>
+        prevSpecimens.map((specimen) =>
+          specimen.specimenType === specimenType
+            ? {
+                ...specimen,
+                quantity: specimen.quantity + 1,
+              }
+            : specimen
+        )
+      );
+    }
+
+    setPrevValue(currentValue);
+  };
   return (
     <div style={{ marginBottom: "3rem" }}>
-      <pre>{JSON.stringify(savedOptions, null, 4)}</pre>
+      <pre>{JSON.stringify(specimenData, null, 4)}</pre>
       <br />
-      <pre>{JSON.stringify(inputValues, null, 4)}</pre>
-      <br />
+      <Box>
+        {specimenData.map((specimen) => (
+          <Box
+            sx={{ border: "1px solid black", display: "flex", gap: "2rem" }}
+            key={specimen.specimenType}
+          >
+            <h1>{specimen.specimenType}</h1>
+            <input
+              onKeyDown={handleKeyDown}
+              onChange={(e) => handleChangeQuantity(e, specimen.specimenType)}
+              style={{ width: "2.3rem", textAlign: "center" }}
+              type="number"
+              value={specimen.quantity}
+            />
+          </Box>
+        ))}
+      </Box>
+      <hr />
       <h1>NESTED ARRAY UPDATE</h1>
       <Autocomplete
         onChange={(event, value) => {
