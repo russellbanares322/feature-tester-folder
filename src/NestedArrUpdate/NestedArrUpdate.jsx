@@ -3,7 +3,60 @@ import { Box } from "@mui/system";
 import { Button, Input, Modal } from "antd";
 import React, { useState } from "react";
 
+const options = [
+  {
+    id: 1,
+    name: "Option 1",
+    additionalReq: [
+      {
+        id: 200,
+        requirementType: 0,
+        requirementDetails: "First Name",
+        isRequired: true,
+      },
+      {
+        id: 201,
+        requirementType: 1,
+        requirementDetails: "Height",
+        isRequired: true,
+      },
+      {
+        id: 202,
+        requirementType: 3,
+        requirementDetails: "Gender",
+        isRequired: true,
+        values: ["Male", "Female"],
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: "Option 2",
+    additionalReq: [
+      {
+        id: 203,
+        requirementType: 0,
+        requirementDetails: "Last Name",
+        isRequired: true,
+      },
+      {
+        id: 999,
+        requirementType: 3,
+        requirementDetails: "Did you give a consent for this test?",
+        values: ["Yes", "No"],
+        isRequired: true,
+      },
+    ],
+  },
+  {
+    id: 3,
+    name: "Option 3",
+    additionalReq: [],
+  },
+];
+
 const NestedArrUpdate = () => {
+  const [dropdownOptions, setDropdownOptions] = useState(options);
   const [savedOptions, setSavedOptions] = useState({
     clientId: 12345,
     patientId: 0,
@@ -38,7 +91,22 @@ const NestedArrUpdate = () => {
   };
 
   const handleSubmitDynamicInputs = () => {
-    console.log(dynamicInputs);
+    setDropdownOptions([
+      ...dropdownOptions,
+      {
+        id: Math.floor(Math.random() * new Date(Date.now()) * 6),
+        name: "Option 8",
+        additionalReq: [
+          {
+            id: Math.floor(Math.random() * new Date(Date.now()) * 9 + 1),
+            requirementType: 3,
+            requirementDetails: "Are you old enough?",
+            values: dynamicInputs,
+          },
+        ],
+      },
+    ]);
+    setDynamicInputs([""]);
   };
   const inputTypeOptions = [
     {
@@ -60,58 +128,6 @@ const NestedArrUpdate = () => {
     {
       id: 4,
       type: "checkbox",
-    },
-  ];
-
-  const dropdownOptions = [
-    {
-      id: 1,
-      name: "Option 1",
-      additionalReq: [
-        {
-          id: 200,
-          requirementType: 0,
-          requirementDetails: "First Name",
-          isRequired: true,
-        },
-        {
-          id: 201,
-          requirementType: 1,
-          requirementDetails: "Height",
-          isRequired: true,
-        },
-        {
-          id: 202,
-          requirementType: 3,
-          requirementDetails: "Gender",
-          isRequired: true,
-          values: ["Male", "Female"],
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "Option 2",
-      additionalReq: [
-        {
-          id: 203,
-          requirementType: 0,
-          requirementDetails: "Last Name",
-          isRequired: true,
-        },
-        {
-          id: 999,
-          requirementType: 3,
-          requirementDetails: "Did you give a consent for this test?",
-          values: ["Yes", "No"],
-          isRequired: true,
-        },
-      ],
-    },
-    {
-      id: 3,
-      name: "Option 3",
-      additionalReq: [],
     },
   ];
 
@@ -237,22 +253,29 @@ const NestedArrUpdate = () => {
   return (
     <div style={{ marginBottom: "3rem" }}>
       <pre>{JSON.stringify(savedOptions, null, 4)}</pre>
-      <pre>{JSON.stringify(dynamicInputs, null, 4)}</pre>
       <h1>DYNAMIC INPUTS</h1>
-      <Button onClick={handleAddDynamicInput} type="primary">
+      <Button
+        style={{ marginBottom: "1rem" }}
+        onClick={handleAddDynamicInput}
+        type="primary"
+      >
         Add
       </Button>
       {dynamicInputs?.map((_, index) => (
-        <div key={index}>
-          <Input onChange={(e) => handleDynamicInputChange(e, index)} />
+        <Box sx={{ display: "flex", gap: "0.5rem" }} key={index}>
+          <Input
+            style={{ marginBottom: "0.5rem" }}
+            onChange={(e) => handleDynamicInputChange(e, index)}
+          />
           <Button
+            style={{ opacity: index === 0 ? 0 : 1 }}
             onClick={() => handleDeleteDynamicInput(index)}
             type="primary"
             danger
           >
             X
           </Button>
-        </div>
+        </Box>
       ))}
       <Button onClick={handleSubmitDynamicInputs} type="primary">
         Submit Inputs
@@ -309,7 +332,7 @@ const NestedArrUpdate = () => {
             <div key={input.id}>
               <label>{input.requirementDetails}</label>
               {input.requirementType === 3 ? ( // Check if input type is radio
-                input?.values.map((value) => (
+                input?.values.map((value, index) => (
                   <div key={value}>
                     <label>
                       <input
