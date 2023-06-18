@@ -115,8 +115,6 @@ function App() {
       <ThemeProvider theme={theme}>
         <NestedArrUpdate />
         <hr />
-        <hr />
-        <hr />
         <FilterData />
         <hr />
         <AntDesignRecursive />

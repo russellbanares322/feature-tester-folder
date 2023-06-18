@@ -1,33 +1,9 @@
 import { Autocomplete, TextField } from "@mui/material";
 import { Box } from "@mui/system";
-import { Button, Modal } from "antd";
+import { Button, Input, Modal } from "antd";
 import React, { useState } from "react";
 
-const specimens = [
-  {
-    specimenType: "Specimen A",
-    quantity: 1,
-  },
-  {
-    specimenType: "Specimen B",
-    quantity: 3,
-  },
-  {
-    specimenType: "Specimen C",
-    quantity: 5,
-  },
-  {
-    specimenType: "Specimen D",
-    quantity: 1,
-  },
-  {
-    specimenType: "Specimen E",
-    quantity: 1,
-  },
-];
-
 const NestedArrUpdate = () => {
-  const [specimenData, setSpecimenData] = useState(specimens);
   const [savedOptions, setSavedOptions] = useState({
     clientId: 12345,
     patientId: 0,
@@ -41,6 +17,51 @@ const NestedArrUpdate = () => {
   const [isForEdit, setIsForEdit] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [inputValues, setInputValues] = useState([]);
+  const [dynamicInputs, setDynamicInputs] = useState([""]);
+
+  const handleAddDynamicInput = () => {
+    const addedInput = [...dynamicInputs, []];
+    setDynamicInputs(addedInput);
+  };
+
+  const handleDeleteDynamicInput = (index) => {
+    const filteredDynamicInput = dynamicInputs.filter(
+      (_, idx) => idx !== index
+    );
+    setDynamicInputs(filteredDynamicInput);
+  };
+
+  const handleDynamicInputChange = (e, index) => {
+    const inputData = [...dynamicInputs];
+    inputData[index] = e.target.value;
+    setDynamicInputs(inputData);
+  };
+
+  const handleSubmitDynamicInputs = () => {
+    console.log(dynamicInputs);
+  };
+  const inputTypeOptions = [
+    {
+      id: 0,
+      type: "text",
+    },
+    {
+      id: 1,
+      type: "number",
+    },
+    {
+      id: 2,
+      type: "date",
+    },
+    {
+      id: 3,
+      type: "radio",
+    },
+    {
+      id: 4,
+      type: "checkbox",
+    },
+  ];
 
   const dropdownOptions = [
     {
@@ -61,9 +82,10 @@ const NestedArrUpdate = () => {
         },
         {
           id: 202,
-          requirementType: 2,
-          requirementDetails: "Birthdate",
+          requirementType: 3,
+          requirementDetails: "Gender",
           isRequired: true,
+          values: ["Male", "Female"],
         },
       ],
     },
@@ -77,27 +99,19 @@ const NestedArrUpdate = () => {
           requirementDetails: "Last Name",
           isRequired: true,
         },
+        {
+          id: 999,
+          requirementType: 3,
+          requirementDetails: "Did you give a consent for this test?",
+          values: ["Yes", "No"],
+          isRequired: true,
+        },
       ],
     },
     {
       id: 3,
       name: "Option 3",
       additionalReq: [],
-    },
-  ];
-
-  const inputTypeOptions = [
-    {
-      id: 0,
-      type: "text",
-    },
-    {
-      id: 1,
-      type: "number",
-    },
-    {
-      id: 2,
-      type: "date",
     },
   ];
 
@@ -220,63 +234,33 @@ const NestedArrUpdate = () => {
       req.isRequired && !inputValues.find((value) => value.id === req.id)?.value
   );
 
-  const [prevValue, setPrevValue] = useState(1);
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Delete" || e.key === "Backspace") {
-      event.preventDefault(); // Cancel the delete action
-    }
-  };
-  const handleChangeQuantity = (e, specimenType) => {
-    const currentValue = Number(e.target.value);
-    if (currentValue < 1) return;
-    if (currentValue < prevValue) {
-      setSpecimenData((prevSpecimens) =>
-        prevSpecimens.map((specimen) =>
-          specimen.specimenType === specimenType
-            ? {
-                ...specimen,
-                quantity: specimen.quantity - 1,
-              }
-            : specimen
-        )
-      );
-    } else {
-      setSpecimenData((prevSpecimens) =>
-        prevSpecimens.map((specimen) =>
-          specimen.specimenType === specimenType
-            ? {
-                ...specimen,
-                quantity: specimen.quantity + 1,
-              }
-            : specimen
-        )
-      );
-    }
-
-    setPrevValue(currentValue);
-  };
   return (
     <div style={{ marginBottom: "3rem" }}>
-      <pre>{JSON.stringify(specimenData, null, 4)}</pre>
-      <br />
-      <Box>
-        {specimenData.map((specimen) => (
-          <Box
-            sx={{ border: "1px solid black", display: "flex", gap: "2rem" }}
-            key={specimen.specimenType}
+      <pre>{JSON.stringify(savedOptions, null, 4)}</pre>
+      <pre>{JSON.stringify(dynamicInputs, null, 4)}</pre>
+      <h1>DYNAMIC INPUTS</h1>
+      <Button onClick={handleAddDynamicInput} type="primary">
+        Add
+      </Button>
+      {dynamicInputs?.map((_, index) => (
+        <div key={index}>
+          <Input onChange={(e) => handleDynamicInputChange(e, index)} />
+          <Button
+            onClick={() => handleDeleteDynamicInput(index)}
+            type="primary"
+            danger
           >
-            <h1>{specimen.specimenType}</h1>
-            <input
-              onKeyDown={handleKeyDown}
-              onChange={(e) => handleChangeQuantity(e, specimen.specimenType)}
-              style={{ width: "2.3rem", textAlign: "center" }}
-              type="number"
-              value={specimen.quantity}
-            />
-          </Box>
-        ))}
-      </Box>
+            X
+          </Button>
+        </div>
+      ))}
+      <Button onClick={handleSubmitDynamicInputs} type="primary">
+        Submit Inputs
+      </Button>
+      <br />
+      <br />
+      <br />
+      <br />
       <hr />
       <h1>NESTED ARRAY UPDATE</h1>
       <Autocomplete
@@ -295,6 +279,7 @@ const NestedArrUpdate = () => {
         {savedOptionData.length > 0 &&
           savedOptionData.map((option) => (
             <div
+              key={option.id}
               onClick={() => handleSelectOptionToEdit(option)}
               style={{
                 backgroundColor: "gray",
@@ -320,10 +305,54 @@ const NestedArrUpdate = () => {
         onCancel={handleCancel}
       >
         <Box sx={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}>
-          {selectedOption &&
-            selectedOption?.additionalReq.map((input) => (
-              <>
-                <label>{input.requirementDetails}</label>
+          {selectedOption?.additionalReq.map((input) => (
+            <div key={input.id}>
+              <label>{input.requirementDetails}</label>
+              {input.requirementType === 3 ? ( // Check if input type is radio
+                input?.values.map((value) => (
+                  <div key={value}>
+                    <label>
+                      <input
+                        type="radio"
+                        value={value}
+                        checked={
+                          inputValues.find((value) => value.id === input.id)
+                            ?.value === value
+                        }
+                        onChange={(e) => handleInputChange(e, input.id)}
+                      />
+                      {value}
+                    </label>
+                  </div>
+                ))
+              ) : input.requirementType === 4 ? ( // Check if input type is checkbox
+                <div>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="option1"
+                      checked={
+                        inputValues.find((value) => value.id === input.id)
+                          ?.value || false
+                      }
+                      onChange={(e) => handleInputChange(e, input.id)}
+                    />
+                    Option 1
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="option2"
+                      checked={
+                        inputValues.find((value) => value.id === input.id)
+                          ?.value || false
+                      }
+                      onChange={(e) => handleInputChange(e, input.id)}
+                    />
+                    Option 2
+                  </label>
+                </div>
+              ) : (
                 <TextField
                   key={input.id}
                   required={input.isRequired}
@@ -338,8 +367,9 @@ const NestedArrUpdate = () => {
                   }
                   onChange={(e) => handleInputChange(e, input.id)}
                 />
-              </>
-            ))}
+              )}
+            </div>
+          ))}
         </Box>
       </Modal>
     </div>
