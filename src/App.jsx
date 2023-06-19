@@ -7,7 +7,6 @@ import FStep from "./Grids/fStep";
 import { createTheme, Grid, ThemeProvider, Typography } from "@mui/material";
 import SidePanel from "./Grids/sidePanel";
 import { Route, Routes } from "react-router-dom";
-import FormModal from "./components/patient-form/FormModal";
 import Dboard from "./Grids/Dboard";
 import AutoComplete from "./Grids/AutoComplete";
 import DynamicInputs from "./Grids/DynamicInputs";
@@ -16,6 +15,7 @@ import AntDesignRecursive from "./Grids/AntDesignRecursive";
 import Ldboard from "./Grids/Ldboard";
 import FilterData from "./Grids/FilterData";
 import NestedArrUpdate from "./NestedArrUpdate/NestedArrUpdate";
+import BlurryLines from "./Grids/BlurryLines";
 
 function Entry({ entry, depth }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -113,6 +113,9 @@ function App() {
         <Route path="/ldboard" element={<Ldboard />} />
       </Routes>
       <ThemeProvider theme={theme}>
+        <BlurryLines />
+        <br />
+        <hr />
         <NestedArrUpdate />
         <hr />
         <FilterData />
