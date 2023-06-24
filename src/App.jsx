@@ -15,7 +15,7 @@ import AntDesignRecursive from "./Grids/AntDesignRecursive";
 import Ldboard from "./Grids/Ldboard";
 import FilterData from "./Grids/FilterData";
 import NestedArrUpdate from "./NestedArrUpdate/NestedArrUpdate";
-import BlurryLines from "./Grids/BlurryLines";
+import AddSpecimen from "./NestedArrUpdate/AddSpecimen";
 
 function Entry({ entry, depth }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -113,8 +113,8 @@ function App() {
         <Route path="/ldboard" element={<Ldboard />} />
       </Routes>
       <ThemeProvider theme={theme}>
-        <BlurryLines />
         <br />
+        <AddSpecimen />
         <hr />
         <NestedArrUpdate />
         <hr />

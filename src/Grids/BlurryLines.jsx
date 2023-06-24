@@ -73,6 +73,7 @@ const BlurryLines = () => {
                 }}
                 key={idx}
               ></div>
+              {adjustedIndex}
             </>
           );
         })}
