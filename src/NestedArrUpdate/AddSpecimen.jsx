@@ -1,69 +1,35 @@
 import { Autocomplete, TextField } from "@mui/material";
+import axios from "axios";
 import React, { useState } from "react";
 
-export const TestOptions = [
+export const labTestLookup = [
   {
     id: 555,
     type: "Package",
     name: "First Package",
-    child: [
-      {
-        id: 888,
-        type: "Test",
-        name: "First Test",
-        testDetails: {
-          specimen: "Serum",
-          volumeRequirement: "2.0mL",
-        },
-        child: [],
-      },
-      {
-        id: 999,
-        type: "Profile",
-        name: "First Profile",
-        child: [
-          {
-            id: 141,
-            type: "Test",
-            name: "Second Test",
-            testDetails: {
-              specimen: "Whole blood",
-              volumeRequirement: "1mL",
-            },
-          },
-        ],
-      },
-    ],
+    specimen: null,
+    volumeRequirement: null,
   },
   {
     id: 551,
     type: "Test",
     name: "Third Test",
-    testDetails: {
-      specimen: "Slide",
-      volumeRequirement: "3mL",
-    },
-    child: [],
+    specimen: "Slide",
+    volumeRequirement: "3mL",
   },
   {
     id: 557,
     type: "Test",
     name: "Fourth Test",
-    testDetails: {
-      specimen: "Serum",
-      volumeRequirement: "10mL",
-    },
-    child: [],
+    specimen: "Serum",
+    volumeRequirement: "10mL",
   },
   {
     id: 989,
     type: "Test",
     name: "Fifth Test",
-    testDetails: {
-      specimen: "Serum",
-      volumeRequirement: "50mL",
-    },
-    child: [],
+    specimen: "Serum",
+    volumeRequirement: "50mL",
   },
 ];
 
@@ -76,24 +42,53 @@ const AddSpecimen = () => {
     const isSelectedTestAlreadyAdded = savedTestNames.includes(
       selectedTest.name
     );
-    const specimensToAdd = getSpecimenRecursively(selectedTest);
+    const isSpecimenNotNull = selectedTest.specimen !== null;
+    const isVolumeRequirementNotNull = selectedTest.volumeRequirement !== null;
+    const isSpecimenCanBeAdded = !savedSpecimensArr.find(
+      (data) => data.specimen === selectedTest?.specimen
+    );
 
     if (!isSelectedTestAlreadyAdded) {
-      setSavedTestArr([
-        ...savedTestArr,
-        {
-          id: selectedTest.id,
-          name: selectedTest.name,
-        },
-      ]);
+      axios
+        .get(`http://localhost:8000/labTest/${selectedTest.id}`)
+        .then((response) => {
+          const specimensToAdd = getSpecimenRecursively(response.data);
+          setSavedTestArr([
+            ...savedTestArr,
+            {
+              id: response.data?.id,
+              name: response.data?.name,
+              specimen:
+                response.data?.child?.length > 0
+                  ? specimensToAdd.map((data) => data.specimen)
+                  : [response.data?.testDetails?.specimen],
+            },
+          ]);
 
-      specimensToAdd.map((specimen) => {
-        if (
-          !savedSpecimensArr.find((data) => data.specimen === specimen.specimen)
-        ) {
-          setSavedSpecimensArr((prevArr) => [...prevArr, specimen]);
-        }
-      });
+          specimensToAdd.map((specimen) => {
+            if (
+              !savedSpecimensArr.find(
+                (data) => data.specimen === specimen.specimen
+              )
+            ) {
+              setSavedSpecimensArr((prevArr) => [...prevArr, specimen]);
+            }
+          });
+        });
+
+      if (
+        isSpecimenNotNull &&
+        isVolumeRequirementNotNull &&
+        isSpecimenCanBeAdded
+      ) {
+        setSavedSpecimensArr([
+          ...savedSpecimensArr,
+          {
+            specimen: selectedTest.specimen,
+            volumeRequirement: selectedTest.volumeRequirement,
+          },
+        ]);
+      }
     }
   };
 
@@ -103,8 +98,8 @@ const AddSpecimen = () => {
     data.child?.map((item) => {
       if (item?.testDetails) {
         selectedSpecimens.push({
-          specimen: item?.testDetails.specimen,
-          volumeRequirement: item?.testDetails.volumeRequirement,
+          specimen: item?.testDetails?.specimen,
+          volumeRequirement: item?.testDetails?.volumeRequirement,
         });
       }
       if (item?.child && item?.child.length > 0) {
@@ -115,9 +110,26 @@ const AddSpecimen = () => {
     return selectedSpecimens;
   };
 
+  const handleDeleteTestInArr = (selectedTest) => {
+    const specimensInTest = savedTestArr.map((test) => test.specimen);
+    const filteredTest = savedTestArr.filter(
+      (test) => test.id !== selectedTest.id
+    );
+    setSavedTestArr(filteredTest);
+
+    if (!specimensInTest.includes(selectedTest.specimen.toString())) {
+      const filteredSpecimen = savedSpecimensArr.filter(
+        (data) => !specimensInTest.includes(data.specimen)
+      );
+      setSavedSpecimensArr(filteredSpecimen);
+    }
+  };
+
   return (
     <div style={{ marginBottom: "6rem" }}>
       <h1>Add Specimen</h1>
+      <pre>{JSON.stringify(savedTestArr, null, 4)}</pre>
+      <br />
       <pre>{JSON.stringify(savedSpecimensArr, null, 4)}</pre>
       <br />
       <Autocomplete
@@ -125,7 +137,7 @@ const AddSpecimen = () => {
         onChange={(event, value) => {
           handleAddTestAndSpecimenInArr(value);
         }}
-        options={TestOptions}
+        options={labTestLookup}
         renderInput={(params) => (
           <TextField {...params} placeholder="Add test in table" />
         )}
@@ -135,13 +147,20 @@ const AddSpecimen = () => {
       <h1>TEST ARR</h1>
       <table>
         <thead>
-          <th>Test Name</th>
+          <th style={{ borderRight: "1px solid red" }}>Test Name</th>
+          <th>Action</th>
         </thead>
         <tbody>
           {savedTestArr?.map((test) => (
             <tr key={test.id}>
               <td style={{ color: "green", paddingLeft: "2rem" }}>
                 {test.name}
+              </td>
+              <td
+                onClick={() => handleDeleteTestInArr(test)}
+                style={{ color: "red", cursor: "pointer" }}
+              >
+                Delete
               </td>
             </tr>
           ))}
