@@ -37,7 +37,7 @@ const AddSpecimen = () => {
   const [savedTestArr, setSavedTestArr] = useState([]);
   const [savedSpecimensArr, setSavedSpecimensArr] = useState([]);
 
-  const handleAddTestAndSpecimenInArr = (selectedTest) => {
+  const handleAddTestAndSpecimenInArr = async (selectedTest) => {
     const savedTestNames = savedTestArr?.map((test) => test.name);
     const isSelectedTestAlreadyAdded = savedTestNames.includes(
       selectedTest.name
@@ -49,7 +49,7 @@ const AddSpecimen = () => {
     );
 
     if (!isSelectedTestAlreadyAdded) {
-      axios
+      await axios
         .get(`http://localhost:8000/labTest/${selectedTest.id}`)
         .then((response) => {
           const specimensToAdd = getSpecimenRecursively(response.data);
@@ -111,15 +111,18 @@ const AddSpecimen = () => {
   };
 
   const handleDeleteTestInArr = (selectedTest) => {
-    const specimensInTest = savedTestArr.map((test) => test.specimen);
+    const isSpecimenAllowedToDelete = savedTestArr.some((test) =>
+      test.specimen.includes(selectedTest.specimen)
+    );
+
     const filteredTest = savedTestArr.filter(
       (test) => test.id !== selectedTest.id
     );
     setSavedTestArr(filteredTest);
 
-    if (!specimensInTest.includes(selectedTest.specimen.toString())) {
+    if (!isSpecimenAllowedToDelete) {
       const filteredSpecimen = savedSpecimensArr.filter(
-        (data) => !specimensInTest.includes(data.specimen)
+        (data) => !selectedTest.specimen.includes(data.specimen)
       );
       setSavedSpecimensArr(filteredSpecimen);
     }
@@ -128,8 +131,10 @@ const AddSpecimen = () => {
   return (
     <div style={{ marginBottom: "6rem" }}>
       <h1>Add Specimen</h1>
+      <h3>DATA THAT IS BEING SELECTED</h3>
       <pre>{JSON.stringify(savedTestArr, null, 4)}</pre>
       <br />
+      <h3>Saved Specimens</h3>
       <pre>{JSON.stringify(savedSpecimensArr, null, 4)}</pre>
       <br />
       <Autocomplete
