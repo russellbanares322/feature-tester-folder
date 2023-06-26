@@ -31,6 +31,13 @@ export const labTestLookup = [
     specimen: "Serum",
     volumeRequirement: "50mL",
   },
+  {
+    id: 89221,
+    type: "Test",
+    name: "Final Test",
+    specimen: null,
+    volumeRequirement: "210mL",
+  },
 ];
 
 const AddSpecimen = () => {
@@ -60,8 +67,13 @@ const AddSpecimen = () => {
               name: response.data?.name,
               specimen:
                 response.data?.child?.length > 0
-                  ? specimensToAdd.map((data) => data.specimen)
-                  : [response.data?.testDetails?.specimen],
+                  ? specimensToAdd
+                      .map((data) => data.specimen)
+                      .toString()
+                      .replace(/,/g, " ")
+                  : [response.data?.testDetails?.specimen]
+                      .toString()
+                      .replace(/,/g, " "),
             },
           ]);
 
@@ -111,21 +123,26 @@ const AddSpecimen = () => {
   };
 
   const handleDeleteTestInArr = (selectedTest) => {
-    const isSpecimenAllowedToDelete = savedTestArr.some((test) =>
-      test.specimen.includes(selectedTest.specimen)
-    );
-
     const filteredTest = savedTestArr.filter(
       (test) => test.id !== selectedTest.id
     );
     setSavedTestArr(filteredTest);
 
-    if (!isSpecimenAllowedToDelete) {
-      const filteredSpecimen = savedSpecimensArr.filter(
-        (data) => !selectedTest.specimen.includes(data.specimen)
+    const specimensToRemove = savedSpecimensArr.filter((data) => {
+      const isSpecimenPresentInOtherTests = savedTestArr.some(
+        (test) => test !== selectedTest && test.specimen.includes(data.specimen)
       );
-      setSavedSpecimensArr(filteredSpecimen);
-    }
+
+      return !isSpecimenPresentInOtherTests;
+    });
+
+    const filteredSpecimens = savedSpecimensArr.filter(
+      (data) =>
+        !specimensToRemove.some(
+          (specimen) => specimen.specimen === data.specimen
+        )
+    );
+    setSavedSpecimensArr(filteredSpecimens);
   };
 
   return (
