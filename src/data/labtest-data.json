@@ -10,9 +10,17 @@
           "type": "Test",
           "name": "First Test",
           "testDetails": {
-            "specimen": "Serum",
-            "volumeRequirement": "2.0mL"
+            "isStatAllowed": true,
+            "requiresBloodDraw": false
           },
+          "labTestSpecimens":[
+              {
+                "id": "MMY",
+                "specimen":{
+                  "name": "Serum"
+                }
+              }
+          ],
           "child": []
         },
         {
@@ -30,9 +38,17 @@
                   "type": "Test",
                   "name": "Inside Test",
                   "testDetails": {
-                    "specimen": "Brew blood",
-                    "volumeRequirement": "100mL"
+                    "isStatAllowed": true,
+                    "requiresBloodDraw": false
                   },
+                  "labTestSpecimens":[
+                      {
+                        "id": "XXC",
+                        "specimen":{
+                          "name": "Xamaxi"
+                        }
+                      }
+                  ],
                   "child":[]
                 }
               ]
@@ -42,30 +58,53 @@
               "type": "Test",
               "name": "Second Test",
               "testDetails": {
-                "specimen": "Whole blood",
-                "volumeRequirement": "1mL"
+                "isStatAllowed": true,
+                "requiresBloodDraw": false
               },
+              "labTestSpecimens":[
+                  {
+                    "id": "BCX",
+                    "specimen":{
+                      "name": "Whole blood"
+                    }
+                  }
+              ],
               "child": []
             },
             {
               "id": 100,
               "type": "Test",
               "name": "Xyz Test",
-              "testDetails": {
-                "specimen": "Xyz Specimen",
-                "volumeRequirement": "5mL"
-            }
-            ,
+            "testDetails": {
+              "isStatAllowed": true,
+              "requiresBloodDraw": false
+            },
+            "labTestSpecimens":[
+                {
+                  "id": "HHK",
+                  "specimen":{
+                    "name": "Xyz Specimen"
+                  }
+                }
+            ],
               "child": []
           },
             {
               "id": 870,
               "type": "Test",
               "name": "Abc Test",
-              "testDetails": {
-                "specimen": "Maxmo Specimen",
-                "volumeRequirement": "20mL"
+             "testDetails": {
+              "isStatAllowed": true,
+              "requiresBloodDraw": false
             },
+            "labTestSpecimens":[
+                {
+                  "id": "MMK",
+                  "specimen":{
+                    "name": "Maxmo Specimen"
+                  }
+                }
+            ],
             "child": []
           }
           ]
@@ -76,10 +115,18 @@
       "id": 551,
       "type": "Test",
       "name": "Third Test",
-      "testDetails": {
-        "specimen": "Slide",
-        "volumeRequirement": "3mL"
-      },
+       "testDetails": {
+              "isStatAllowed": true,
+              "requiresBloodDraw": false
+            },
+            "labTestSpecimens":[
+                {
+                  "id": "SSD",
+                  "specimen":{
+                    "name": "Slide"
+                  }
+                }
+            ],
       "child": []
     },
     {
@@ -87,30 +134,108 @@
       "type": "Test",
       "name": "Fourth Test",
       "testDetails": {
-        "specimen": "Serum",
-        "volumeRequirement": "10mL"
+        "isStatAllowed": true,
+        "requiresBloodDraw": false
       },
+      "labTestSpecimens":[
+          {
+            "id": "MMY",
+            "specimen":{
+              "name": "Serum"
+            }
+          }
+      ],
       "child": []
     },
     {
-      "id": 989,
+      "id": 888,
       "type": "Test",
-      "name": "Fifth Test",
+      "name": "First Test",
       "testDetails": {
-        "specimen": "Serum",
-        "volumeRequirement": "50mL"
+        "isStatAllowed": true,
+        "requiresBloodDraw": false
       },
+      "labTestSpecimens":[
+          {
+            "id": "MMY",
+            "specimen":{
+              "name": "Serum"
+            }
+          }
+      ],
       "child": []
     },
     {
-      "id": 89221,
+      "id": 187,
       "type": "Test",
-      "name": "Final Test",
+      "name": "Inside Test",
       "testDetails": {
-        "specimen": "Brew blood",
-        "volumeRequirement": "210mL"
+        "isStatAllowed": true,
+        "requiresBloodDraw": false
       },
+      "labTestSpecimens":[
+          {
+            "id": "XXC",
+            "specimen":{
+              "name": "Xamaxi"
+            }
+          }
+      ],
+      "child":[]
+    },
+    {
+      "id": 141,
+      "type": "Test",
+      "name": "Second Test",
+      "testDetails": {
+        "isStatAllowed": true,
+        "requiresBloodDraw": false
+      },
+      "labTestSpecimens":[
+          {
+            "id": "BCX",
+            "specimen":{
+              "name": "Whole blood"
+            }
+          }
+      ],
       "child": []
-    }
+    },
+    {
+      "id": 100,
+      "type": "Test",
+      "name": "Xyz Test",
+    "testDetails": {
+      "isStatAllowed": true,
+      "requiresBloodDraw": false
+    },
+    "labTestSpecimens":[
+        {
+          "id": "HHK",
+          "specimen":{
+            "name": "Xyz Specimen"
+          }
+        }
+    ],
+      "child": []
+  },
+  {
+    "id": 870,
+    "type": "Test",
+    "name": "Abc Test",
+   "testDetails": {
+    "isStatAllowed": true,
+    "requiresBloodDraw": false
+  },
+  "labTestSpecimens":[
+      {
+        "id": "MMK",
+        "specimen":{
+          "name": "Maxmo Specimen"
+        }
+      }
+  ],
+  "child": []
+}
   ]
 }

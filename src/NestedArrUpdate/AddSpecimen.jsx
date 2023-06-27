@@ -7,36 +7,46 @@ export const labTestLookup = [
     id: 555,
     type: "Package",
     name: "First Package",
-    specimen: null,
-    volumeRequirement: null,
+  },
+  {
+    id: 888,
+    type: "Test",
+    name: "First Test",
+  },
+  {
+    id: 187,
+    type: "Test",
+    name: "Inside Test",
   },
   {
     id: 551,
     type: "Test",
     name: "Third Test",
-    specimen: "Slide",
-    volumeRequirement: "3mL",
+  },
+  {
+    id: 141,
+    type: "Test",
+    name: "Second Test",
   },
   {
     id: 557,
     type: "Test",
     name: "Fourth Test",
-    specimen: "Serum",
-    volumeRequirement: "10mL",
   },
   {
-    id: 989,
+    id: 100,
     type: "Test",
-    name: "Fifth Test",
-    specimen: "Serum",
-    volumeRequirement: "50mL",
+    name: "Xyz Test",
   },
   {
-    id: 89221,
+    id: 870,
     type: "Test",
-    name: "Final Test",
-    specimen: null,
-    volumeRequirement: "210mL",
+    name: "Abc Test",
+  },
+  {
+    id: 100,
+    type: "Test",
+    name: "Xyz Test",
   },
 ];
 
@@ -49,17 +59,22 @@ const AddSpecimen = () => {
     const isSelectedTestAlreadyAdded = savedTestNames.includes(
       selectedTest.name
     );
-    const isSpecimenNotNull = selectedTest.specimen !== null;
-    const isVolumeRequirementNotNull = selectedTest.volumeRequirement !== null;
-    const isSpecimenCanBeAdded = !savedSpecimensArr.find(
-      (data) => data.specimen === selectedTest?.specimen
-    );
 
     if (!isSelectedTestAlreadyAdded) {
       await axios
         .get(`http://localhost:8000/labTest/${selectedTest.id}`)
         .then((response) => {
-          const specimensToAdd = getSpecimenRecursively(response.data);
+          const specimenNamesSaved = savedSpecimensArr.map(
+            (data) => data.specimen
+          );
+          const selectedSpecimen = response?.data?.labTestSpecimens
+            ?.map((data) => data.specimen.name)
+            .toString()
+            .replace(/,/g, " ");
+          const isSpecimenCanBeAdded =
+            !specimenNamesSaved.includes(selectedSpecimen);
+          const isSpecimenNotNull = response.data?.labTestSpecimens?.length > 0;
+          const specimensToAdd = getSpecimenRecursively(response?.data);
           setSavedTestArr([
             ...savedTestArr,
             {
@@ -71,7 +86,8 @@ const AddSpecimen = () => {
                       .map((data) => data.specimen)
                       .toString()
                       .replace(/,/g, " ")
-                  : [response.data?.testDetails?.specimen]
+                  : response.data?.labTestSpecimens
+                      ?.map((data) => data.specimen.name)
                       .toString()
                       .replace(/,/g, " "),
             },
@@ -79,28 +95,28 @@ const AddSpecimen = () => {
 
           specimensToAdd.map((specimen) => {
             if (
-              !savedSpecimensArr.find(
-                (data) => data.specimen === specimen.specimen
+              !savedSpecimensArr.find((data) =>
+                specimen.specimen.includes(data.specimen)
               )
             ) {
               setSavedSpecimensArr((prevArr) => [...prevArr, specimen]);
             }
           });
+          if (isSpecimenNotNull && isSpecimenCanBeAdded) {
+            setSavedSpecimensArr([
+              ...savedSpecimensArr,
+              {
+                specimen:
+                  response.data?.child?.length > 0
+                    ? specimensToAdd
+                    : response.data?.labTestSpecimens
+                        ?.map((data) => data.specimen.name)
+                        .toString()
+                        .replace(/,/g, " "),
+              },
+            ]);
+          }
         });
-
-      if (
-        isSpecimenNotNull &&
-        isVolumeRequirementNotNull &&
-        isSpecimenCanBeAdded
-      ) {
-        setSavedSpecimensArr([
-          ...savedSpecimensArr,
-          {
-            specimen: selectedTest.specimen,
-            volumeRequirement: selectedTest.volumeRequirement,
-          },
-        ]);
-      }
     }
   };
 
@@ -108,10 +124,12 @@ const AddSpecimen = () => {
     let selectedSpecimens = [];
 
     data.child?.map((item) => {
-      if (item?.testDetails) {
+      if (item?.labTestSpecimens) {
         selectedSpecimens.push({
-          specimen: item?.testDetails?.specimen,
-          volumeRequirement: item?.testDetails?.volumeRequirement,
+          specimen: item?.labTestSpecimens
+            .map((data) => data.specimen.name)
+            .toString()
+            .replace(/,/g, " "),
         });
       }
       if (item?.child && item?.child.length > 0) {
@@ -193,16 +211,12 @@ const AddSpecimen = () => {
       <table>
         <thead>
           <th style={{ borderRight: "1px solid red" }}>Specimen Name</th>
-          <th>Volume Requirement</th>
         </thead>
         <tbody>
           {savedSpecimensArr?.map((data) => (
             <tr key={data}>
               <td style={{ color: "green", paddingLeft: "2rem" }}>
                 {data.specimen}
-              </td>
-              <td style={{ color: "green", paddingLeft: "2rem" }}>
-                {data.volumeRequirement}
               </td>
             </tr>
           ))}
