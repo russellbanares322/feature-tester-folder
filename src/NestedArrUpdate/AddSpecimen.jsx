@@ -59,6 +59,7 @@ const AddSpecimen = () => {
   const [specimenOptions, setSpecimenOptions] = useState([]);
   const [openSpecimenModal, setOpenSpecimenModal] = useState(false);
   const [selectedSpecimen, setSelectedSpecimen] = useState("");
+  const [savedSelectedDatas, setSavedSelectedDatas] = useState([]);
   const [selectedTestDatas, setSelectedTestDatas] = useState(null);
 
   const handleSelectSpecimen = (e) => {
@@ -93,8 +94,16 @@ const AddSpecimen = () => {
     const isSelectedTestAlreadyAdded = savedTestNames.includes(
       selectedTest.name
     );
+    const savedTestIds = savedSelectedDatas.map((data) => data.id);
+    const isSelectedTestCantBeAdded = savedTestIds.includes(selectedTest.id);
 
-    if (!isSelectedTestAlreadyAdded) {
+    if (isSelectedTestCantBeAdded) {
+      return alert(
+        `${selectedTest?.name} can't be added, because the test is already inside the package`
+      );
+    }
+
+    if (!isSelectedTestAlreadyAdded && !isSelectedTestCantBeAdded) {
       await axios
         .get(`http://localhost:8000/labTest/${selectedTest.id}`)
         .then((response) => {
@@ -142,7 +151,14 @@ const AddSpecimen = () => {
                     specimen.specimen.includes(data.specimen)
                   )
                 ) {
-                  setSavedSpecimensArr((prevArr) => [...prevArr, specimen]);
+                  setSavedSpecimensArr((prevArr) => [
+                    ...prevArr,
+                    { specimen: specimen.specimen },
+                  ]);
+                  setSavedSelectedDatas((prevDatas) => [
+                    ...prevDatas,
+                    { id: specimen.testId },
+                  ]);
                 }
               });
             } else {
@@ -157,6 +173,10 @@ const AddSpecimen = () => {
                   },
                 ]);
               }
+              setSavedSelectedDatas([
+                ...savedSelectedDatas,
+                { id: response?.data?.id },
+              ]);
             }
           }
         });
@@ -165,10 +185,10 @@ const AddSpecimen = () => {
 
   const getSpecimenRecursively = (data) => {
     let selectedSpecimens = [];
-
     data?.child?.map((item) => {
       if (item?.labTestSpecimens) {
         selectedSpecimens.push({
+          testId: item?.id,
           specimen: item?.labTestSpecimens
             .map((data) => data.specimen.name)
             .toString()
@@ -184,6 +204,10 @@ const AddSpecimen = () => {
   };
 
   const handleDeleteTestInArr = (selectedTest) => {
+    const filteredSavedTest = savedSelectedDatas.filter(
+      (data) => data.id !== selectedTest.id
+    );
+    setSavedSelectedDatas(filteredSavedTest);
     const filteredTest = savedTestArr.filter(
       (test) => test.id !== selectedTest.id
     );
@@ -209,6 +233,8 @@ const AddSpecimen = () => {
   return (
     <div style={{ marginBottom: "6rem" }}>
       <h1>Add Specimen</h1>
+      <h3>SAVED ID'S</h3>
+      <pre>{JSON.stringify(savedSelectedDatas, null, 4)}</pre>
       <h3>DATA THAT IS BEING SELECTED</h3>
       <pre>{JSON.stringify(savedTestArr, null, 4)}</pre>
       <br />
