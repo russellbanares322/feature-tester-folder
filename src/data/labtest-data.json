@@ -233,6 +233,12 @@
         "specimen":{
           "name": "Maxmo Specimen"
         }
+      },
+      {
+        "id": "PDF",
+        "specimen":{
+          "name": "Pudgero Specimen"
+        }
       }
   ],
   "child": []

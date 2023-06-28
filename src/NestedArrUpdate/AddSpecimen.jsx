@@ -1,4 +1,12 @@
-import { Autocomplete, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
+import { Modal } from "antd";
 import axios from "axios";
 import React, { useState } from "react";
 
@@ -43,17 +51,43 @@ export const labTestLookup = [
     type: "Test",
     name: "Abc Test",
   },
-  {
-    id: 100,
-    type: "Test",
-    name: "Xyz Test",
-  },
 ];
 
 const AddSpecimen = () => {
   const [savedTestArr, setSavedTestArr] = useState([]);
   const [savedSpecimensArr, setSavedSpecimensArr] = useState([]);
+  const [specimenOptions, setSpecimenOptions] = useState([]);
+  const [openSpecimenModal, setOpenSpecimenModal] = useState(false);
+  const [selectedSpecimen, setSelectedSpecimen] = useState("");
+  const [selectedTestDatas, setSelectedTestDatas] = useState(null);
 
+  const handleSelectSpecimen = (e) => {
+    setSelectedSpecimen(e.target.value);
+  };
+
+  const handleSubmitSpecimen = () => {
+    const specimenNamesSaved = savedSpecimensArr.map((data) => data.specimen);
+    const isSpecimenCanBeAdded = !specimenNamesSaved.includes(selectedSpecimen);
+
+    setSavedTestArr([
+      ...savedTestArr,
+      {
+        id: selectedTestDatas?.id,
+        name: selectedTestDatas?.name,
+        specimen: selectedSpecimen,
+      },
+    ]);
+
+    if (isSpecimenCanBeAdded) {
+      setSavedSpecimensArr([
+        ...savedSpecimensArr,
+        {
+          specimen: selectedSpecimen,
+        },
+      ]);
+    }
+    setOpenSpecimenModal(false);
+  };
   const handleAddTestAndSpecimenInArr = async (selectedTest) => {
     const savedTestNames = savedTestArr?.map((test) => test.name);
     const isSelectedTestAlreadyAdded = savedTestNames.includes(
@@ -64,57 +98,66 @@ const AddSpecimen = () => {
       await axios
         .get(`http://localhost:8000/labTest/${selectedTest.id}`)
         .then((response) => {
+          setSelectedTestDatas(response?.data);
           const specimenNamesSaved = savedSpecimensArr.map(
             (data) => data.specimen
           );
-          const selectedSpecimen = response?.data?.labTestSpecimens
+          const selectedSpecimenFromApi = response?.data?.labTestSpecimens
             ?.map((data) => data.specimen.name)
             .toString()
             .replace(/,/g, " ");
-          const isSpecimenCanBeAdded =
-            !specimenNamesSaved.includes(selectedSpecimen);
-          const isSpecimenNotNull = response.data?.labTestSpecimens?.length > 0;
+          const isSpecimenCanBeAdded = !specimenNamesSaved.includes(
+            selectedSpecimenFromApi
+          );
+          const isSpecimenPlenty = response?.data?.labTestSpecimens?.length > 1;
           const specimensToAdd = getSpecimenRecursively(response?.data);
-          setSavedTestArr([
-            ...savedTestArr,
-            {
-              id: response.data?.id,
-              name: response.data?.name,
-              specimen:
-                response.data?.child?.length > 0
-                  ? specimensToAdd
-                      .map((data) => data.specimen)
-                      .toString()
-                      .replace(/,/g, " ")
-                  : response.data?.labTestSpecimens
-                      ?.map((data) => data.specimen.name)
-                      .toString()
-                      .replace(/,/g, " "),
-            },
-          ]);
 
-          specimensToAdd.map((specimen) => {
-            if (
-              !savedSpecimensArr.find((data) =>
-                specimen.specimen.includes(data.specimen)
+          if (isSpecimenPlenty && selectedTest.type === "Test") {
+            setOpenSpecimenModal(true);
+            setSpecimenOptions(
+              response?.data?.labTestSpecimens?.map(
+                (data) => data?.specimen?.name
               )
-            ) {
-              setSavedSpecimensArr((prevArr) => [...prevArr, specimen]);
-            }
-          });
-          if (isSpecimenNotNull && isSpecimenCanBeAdded) {
-            setSavedSpecimensArr([
-              ...savedSpecimensArr,
+            );
+          } else {
+            //If the type of specimen is an array then dont display that to the UI
+            setSavedTestArr([
+              ...savedTestArr,
               {
+                id: response.data?.id,
+                name: response.data?.name,
                 specimen:
                   response.data?.child?.length > 0
-                    ? specimensToAdd
+                    ? specimensToAdd.map((data) => data.specimen)
                     : response.data?.labTestSpecimens
                         ?.map((data) => data.specimen.name)
                         .toString()
                         .replace(/,/g, " "),
               },
             ]);
+            if (response?.data?.child?.length > 0) {
+              specimensToAdd.map((specimen) => {
+                if (
+                  !savedSpecimensArr.find((data) =>
+                    specimen.specimen.includes(data.specimen)
+                  )
+                ) {
+                  setSavedSpecimensArr((prevArr) => [...prevArr, specimen]);
+                }
+              });
+            } else {
+              if (isSpecimenCanBeAdded) {
+                setSavedSpecimensArr([
+                  ...savedSpecimensArr,
+                  {
+                    specimen: response.data?.labTestSpecimens
+                      ?.map((data) => data.specimen.name)
+                      .toString()
+                      .replace(/,/g, " "),
+                  },
+                ]);
+              }
+            }
           }
         });
     }
@@ -123,7 +166,7 @@ const AddSpecimen = () => {
   const getSpecimenRecursively = (data) => {
     let selectedSpecimens = [];
 
-    data.child?.map((item) => {
+    data?.child?.map((item) => {
       if (item?.labTestSpecimens) {
         selectedSpecimens.push({
           specimen: item?.labTestSpecimens
@@ -132,7 +175,7 @@ const AddSpecimen = () => {
             .replace(/,/g, " "),
         });
       }
-      if (item?.child && item?.child.length > 0) {
+      if (item?.child && item?.child?.length > 0) {
         const childSpecimens = getSpecimenRecursively(item);
         selectedSpecimens.push(...childSpecimens);
       }
@@ -222,6 +265,27 @@ const AddSpecimen = () => {
           ))}
         </tbody>
       </table>
+      <Modal
+        title={`Please select one specimen for ${selectedTestDatas?.name}`}
+        open={openSpecimenModal}
+        onCancel={() => setOpenSpecimenModal(false)}
+        onOk={handleSubmitSpecimen}
+      >
+        <FormControl fullWidth>
+          <InputLabel id="demo-simple-select-label">Select Specimen</InputLabel>
+          <Select
+            value={selectedSpecimen}
+            onChange={handleSelectSpecimen}
+            label="Specimen"
+          >
+            {specimenOptions?.map((val) => (
+              <MenuItem key={val} value={val}>
+                {val}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Modal>
     </div>
   );
 };
