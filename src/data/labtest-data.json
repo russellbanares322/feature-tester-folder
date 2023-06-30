@@ -24,6 +24,24 @@
           "child": []
         },
         {
+          "id": 557,
+          "type": "Test",
+          "name": "Fourth Test",
+          "testDetails": {
+            "isStatAllowed": true,
+            "requiresBloodDraw": false
+          },
+          "labTestSpecimens":[
+              {
+                "id": "MMY",
+                "specimen":{
+                  "name": "Serum"
+                }
+              }
+          ],
+          "child": []
+        },
+        {
           "id": 999,
           "type": "Package",
           "name": "Second Package",

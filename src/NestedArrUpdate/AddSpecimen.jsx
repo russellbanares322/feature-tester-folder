@@ -1,6 +1,9 @@
 import {
   Autocomplete,
+  Checkbox,
   FormControl,
+  FormControlLabel,
+  FormGroup,
   InputLabel,
   MenuItem,
   Select,
@@ -58,17 +61,26 @@ const AddSpecimen = () => {
   const [savedSpecimensArr, setSavedSpecimensArr] = useState([]);
   const [specimenOptions, setSpecimenOptions] = useState([]);
   const [openSpecimenModal, setOpenSpecimenModal] = useState(false);
-  const [selectedSpecimen, setSelectedSpecimen] = useState("");
+  const [selectedSpecimen, setSelectedSpecimen] = useState([]);
   const [savedSelectedDatas, setSavedSelectedDatas] = useState([]);
   const [selectedTestDatas, setSelectedTestDatas] = useState(null);
 
   const handleSelectSpecimen = (e) => {
-    setSelectedSpecimen(e.target.value);
+    const { value } = e.target;
+    const index = selectedSpecimen.indexOf(value);
+
+    if (index === -1) {
+      setSelectedSpecimen([...selectedSpecimen, value]);
+    } else {
+      setSelectedSpecimen(selectedSpecimen.filter((val) => val !== value));
+    }
   };
 
   const handleSubmitSpecimen = () => {
     const specimenNamesSaved = savedSpecimensArr.map((data) => data.specimen);
-    const isSpecimenCanBeAdded = !specimenNamesSaved.includes(selectedSpecimen);
+    const isSpecimenCanBeAdded = !specimenNamesSaved.includes(
+      selectedSpecimen.map((val) => val)
+    );
 
     setSavedTestArr([
       ...savedTestArr,
@@ -80,12 +92,9 @@ const AddSpecimen = () => {
     ]);
 
     if (isSpecimenCanBeAdded) {
-      setSavedSpecimensArr([
-        ...savedSpecimensArr,
-        {
-          specimen: selectedSpecimen,
-        },
-      ]);
+      selectedSpecimen.map((val) =>
+        setSavedSpecimensArr((prevArr) => [...prevArr, { specimen: val }])
+      );
     }
     setOpenSpecimenModal(false);
   };
@@ -130,20 +139,34 @@ const AddSpecimen = () => {
             );
           } else {
             //If the type of specimen is an array then dont display that to the UI
-            setSavedTestArr([
-              ...savedTestArr,
-              {
-                id: response.data?.id,
-                name: response.data?.name,
-                specimen:
-                  response.data?.child?.length > 0
-                    ? specimensToAdd.map((data) => data.specimen)
-                    : response.data?.labTestSpecimens
-                        ?.map((data) => data.specimen.name)
-                        .toString()
-                        .replace(/,/g, " "),
-              },
-            ]);
+            const testToBeAdded = {
+              id: response.data?.id,
+              name: response.data?.name,
+              specimen:
+                response.data?.child?.length > 0
+                  ? [...new Set(specimensToAdd.map((data) => data.specimen))]
+                  : response.data?.labTestSpecimens
+                      ?.map((data) => data.specimen.name)
+                      .toString()
+                      .replace(/,/g, " "),
+            };
+
+            setSavedTestArr([...savedTestArr, testToBeAdded]);
+
+            if (selectedTest.type !== "Test") {
+              const savedTestIds = savedSelectedDatas.map(
+                (test) => test.testId
+              );
+              setTimeout(() => {
+                setSavedTestArr((prevSavedTest) =>
+                  prevSavedTest.map((test) =>
+                    savedTestIds.includes(test.id)
+                      ? { ...test, ...testToBeAdded }
+                      : test
+                  )
+                );
+              }, 500);
+            }
             if (response?.data?.child?.length > 0) {
               specimensToAdd.map((specimen) => {
                 if (
@@ -157,7 +180,7 @@ const AddSpecimen = () => {
                   ]);
                   setSavedSelectedDatas((prevDatas) => [
                     ...prevDatas,
-                    { id: specimen.testId },
+                    { testId: specimen.testId },
                   ]);
                 }
               });
@@ -175,7 +198,7 @@ const AddSpecimen = () => {
               }
               setSavedSelectedDatas([
                 ...savedSelectedDatas,
-                { id: response?.data?.id },
+                { testId: response?.data?.id },
               ]);
             }
           }
@@ -184,28 +207,37 @@ const AddSpecimen = () => {
   };
 
   const getSpecimenRecursively = (data) => {
-    let selectedSpecimens = [];
-    data?.child?.map((item) => {
+    const selectedSpecimens = {};
+
+    data?.child?.forEach((item) => {
       if (item?.labTestSpecimens) {
-        selectedSpecimens.push({
-          testId: item?.id,
-          specimen: item?.labTestSpecimens
-            .map((data) => data.specimen.name)
-            .toString()
-            .replace(/,/g, " "),
+        item?.labTestSpecimens.forEach((specimenData) => {
+          const specimenName = specimenData.specimen.name;
+          selectedSpecimens[specimenName] = {
+            testId: item.id,
+            specimen: specimenName,
+          };
         });
       }
-      if (item?.child && item?.child?.length > 0) {
+
+      if (item?.child && item.child.length > 0) {
         const childSpecimens = getSpecimenRecursively(item);
-        selectedSpecimens.push(...childSpecimens);
+        Object.entries(childSpecimens).forEach(
+          ([specimenName, specimenData]) => {
+            if (!selectedSpecimens[specimenName]) {
+              selectedSpecimens[specimenName] = specimenData;
+            }
+          }
+        );
       }
     });
-    return selectedSpecimens;
+
+    return Object.values(selectedSpecimens);
   };
 
   const handleDeleteTestInArr = (selectedTest) => {
     const filteredSavedTest = savedSelectedDatas.filter(
-      (data) => data.id !== selectedTest.id
+      (data) => data.testId !== selectedTest.id
     );
     setSavedSelectedDatas(filteredSavedTest);
     const filteredTest = savedTestArr.filter(
@@ -297,20 +329,23 @@ const AddSpecimen = () => {
         onCancel={() => setOpenSpecimenModal(false)}
         onOk={handleSubmitSpecimen}
       >
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Select Specimen</InputLabel>
-          <Select
-            value={selectedSpecimen}
-            onChange={handleSelectSpecimen}
-            label="Specimen"
-          >
-            {specimenOptions?.map((val) => (
-              <MenuItem key={val} value={val}>
-                {val}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        {specimenOptions?.map((value) => (
+          <FormControl key={value}>
+            <FormGroup>
+              <FormControlLabel
+                value={value}
+                control={
+                  <Checkbox
+                    value={value}
+                    checked={selectedSpecimen.includes(value)}
+                    onChange={handleSelectSpecimen}
+                  />
+                }
+                label={value}
+              />
+            </FormGroup>
+          </FormControl>
+        ))}
       </Modal>
     </div>
   );
