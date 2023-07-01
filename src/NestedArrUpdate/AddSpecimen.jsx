@@ -209,9 +209,9 @@ const AddSpecimen = () => {
   const getSpecimenRecursively = (data) => {
     const selectedSpecimens = {};
 
-    data?.child?.forEach((item) => {
+    data?.child?.map((item) => {
       if (item?.labTestSpecimens) {
-        item?.labTestSpecimens.forEach((specimenData) => {
+        item?.labTestSpecimens.map((specimenData) => {
           const specimenName = specimenData.specimen.name;
           selectedSpecimens[specimenName] = {
             testId: item.id,
@@ -222,13 +222,11 @@ const AddSpecimen = () => {
 
       if (item?.child && item.child.length > 0) {
         const childSpecimens = getSpecimenRecursively(item);
-        Object.entries(childSpecimens).forEach(
-          ([specimenName, specimenData]) => {
-            if (!selectedSpecimens[specimenName]) {
-              selectedSpecimens[specimenName] = specimenData;
-            }
+        Object.entries(childSpecimens).map(([specimenName, specimenData]) => {
+          if (!selectedSpecimens[specimenName]) {
+            selectedSpecimens[specimenName] = specimenData;
           }
-        );
+        });
       }
     });
 
@@ -289,6 +287,7 @@ const AddSpecimen = () => {
       <table>
         <thead>
           <th style={{ borderRight: "1px solid red" }}>Test Name</th>
+          <th style={{ borderRight: "1px solid red" }}>Specimen</th>
           <th>Action</th>
         </thead>
         <tbody>
@@ -296,6 +295,9 @@ const AddSpecimen = () => {
             <tr key={test.id}>
               <td style={{ color: "green", paddingLeft: "2rem" }}>
                 {test.name}
+              </td>
+              <td style={{ color: "green", paddingLeft: "2rem" }}>
+                {typeof test.specimen === "string" && test.specimen}
               </td>
               <td
                 onClick={() => handleDeleteTestInArr(test)}
