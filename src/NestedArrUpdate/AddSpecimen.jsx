@@ -82,6 +82,7 @@ const AddSpecimen = () => {
     setSavedTestArr([
       ...savedTestArr,
       {
+        type: selectedTestDatas?.type,
         id: selectedTestDatas?.id,
         name: selectedTestDatas?.name,
         specimen: selectedSpecimen,
@@ -136,15 +137,18 @@ const AddSpecimen = () => {
           } else {
             //If the type of specimen is an array then dont display that to the UI
             const testToBeAdded = {
+              type: response.data?.type,
               id: response.data?.id,
               name: response.data?.name,
               specimen:
                 response.data?.child?.length > 0
                   ? [...new Set(specimensToAdd.map((data) => data.specimen))]
-                  : response.data?.labTestSpecimens
-                      ?.map((data) => data.specimen.name)
-                      .toString()
-                      .replace(/,/g, " "),
+                  : [
+                      response.data?.labTestSpecimens
+                        ?.map((data) => data.specimen.name)
+                        .toString()
+                        .replace(/,/g, " "),
+                    ],
             };
 
             setSavedTestArr([...savedTestArr, testToBeAdded]);
@@ -293,7 +297,7 @@ const AddSpecimen = () => {
                 {test.name}
               </td>
               <td style={{ color: "green", paddingLeft: "2rem" }}>
-                {typeof test.specimen === "string" && test.specimen}
+                {test.type === "Test" && test.specimen.join("/")}
               </td>
               <td
                 onClick={() => handleDeleteTestInArr(test)}
