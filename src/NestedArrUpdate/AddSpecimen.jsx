@@ -78,9 +78,6 @@ const AddSpecimen = () => {
 
   const handleSubmitSpecimen = () => {
     const specimenNamesSaved = savedSpecimensArr.map((data) => data.specimen);
-    const isSpecimenCanBeAdded = !specimenNamesSaved.includes(
-      selectedSpecimen.map((val) => val)
-    );
 
     setSavedTestArr([
       ...savedTestArr,
@@ -90,12 +87,11 @@ const AddSpecimen = () => {
         specimen: selectedSpecimen,
       },
     ]);
-
-    if (isSpecimenCanBeAdded) {
-      selectedSpecimen.map((val) =>
+    selectedSpecimen
+      .filter((val) => !specimenNamesSaved.includes(val))
+      .map((val) =>
         setSavedSpecimensArr((prevArr) => [...prevArr, { specimen: val }])
       );
-    }
     setOpenSpecimenModal(false);
   };
   const handleAddTestAndSpecimenInArr = async (selectedTest) => {
