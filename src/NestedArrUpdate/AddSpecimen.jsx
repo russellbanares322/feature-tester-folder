@@ -170,18 +170,20 @@ const AddSpecimen = () => {
             setSavedTestArr([...savedTestArr, testToBeAdded]);
 
             if (selectedTest.type !== "Test") {
-              const savedTestIds = savedSelectedDatas.map(
-                (test) => test.testId
+              const childTestIds = testIdsToAdd.map((data) => data.testId);
+              const filteredSavedTest = savedTestArr.filter(
+                (data) => !childTestIds.includes(data.id)
               );
-              setTimeout(() => {
-                setSavedTestArr((prevSavedTest) =>
-                  prevSavedTest.map((test) =>
-                    savedTestIds.includes(test.id)
-                      ? { ...test, ...testToBeAdded }
-                      : test
-                  )
-                );
-              }, 500);
+              setSavedTestArr([...filteredSavedTest, testToBeAdded]);
+
+              testIdsToAdd.map((test) => {
+                setSavedSelectedDatas((prevDatas) => [
+                  ...prevDatas.filter(
+                    (data) => !childTestIds.includes(data.testId)
+                  ),
+                  { testId: test.testId },
+                ]);
+              });
             }
             if (response?.data?.child?.length > 0) {
               specimensToAdd.map((specimen) => {
