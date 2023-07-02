@@ -175,15 +175,6 @@ const AddSpecimen = () => {
                 (data) => !childTestIds.includes(data.id)
               );
               setSavedTestArr([...filteredSavedTest, testToBeAdded]);
-
-              testIdsToAdd.map((test) => {
-                setSavedSelectedDatas((prevDatas) => [
-                  ...prevDatas.filter(
-                    (data) => !childTestIds.includes(data.testId)
-                  ),
-                  { testId: test.testId },
-                ]);
-              });
             }
             if (response?.data?.child?.length > 0) {
               specimensToAdd.map((specimen) => {
@@ -199,12 +190,14 @@ const AddSpecimen = () => {
                 }
               });
 
-              testIdsToAdd.map((test) => {
-                setSavedSelectedDatas((prevDatas) => [
-                  ...prevDatas,
-                  { testId: test.testId },
-                ]);
-              });
+              testIdsToAdd
+                .filter((data) => !savedTestIds.includes(data.testId))
+                .map((test) => {
+                  setSavedSelectedDatas((prevDatas) => [
+                    ...prevDatas,
+                    { testId: test.testId },
+                  ]);
+                });
             } else {
               if (isSpecimenCanBeAdded) {
                 setSavedSpecimensArr([
