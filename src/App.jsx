@@ -16,6 +16,7 @@ import Ldboard from "./Grids/Ldboard";
 import FilterData from "./Grids/FilterData";
 import NestedArrUpdate from "./NestedArrUpdate/NestedArrUpdate";
 import AddSpecimen from "./NestedArrUpdate/AddSpecimen";
+import DragAndDrop from "./NestedArrUpdate/DragAndDrop";
 
 function Entry({ entry, depth }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -113,6 +114,7 @@ function App() {
         <Route path="/ldboard" element={<Ldboard />} />
       </Routes>
       <ThemeProvider theme={theme}>
+        <DragAndDrop />
         <br />
         <AddSpecimen />
         <hr />

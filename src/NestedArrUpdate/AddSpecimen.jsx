@@ -4,12 +4,9 @@ import {
   FormControl,
   FormControlLabel,
   FormGroup,
-  InputLabel,
-  MenuItem,
-  Select,
   TextField,
 } from "@mui/material";
-import { Modal } from "antd";
+import { Modal, Button, notification } from "antd";
 import axios from "axios";
 import React, { useState } from "react";
 
@@ -86,12 +83,16 @@ const AddSpecimen = () => {
         id: selectedTestDatas?.id,
         name: selectedTestDatas?.name,
         specimen: selectedSpecimen,
+        key: selectedSpecimen,
       },
     ]);
     selectedSpecimen
       .filter((val) => !specimenNamesSaved.includes(val))
       .map((val) =>
-        setSavedSpecimensArr((prevArr) => [...prevArr, { specimen: val }])
+        setSavedSpecimensArr((prevArr) => [
+          ...prevArr,
+          { specimen: val, key: val },
+        ])
       );
     setOpenSpecimenModal(false);
   };
@@ -100,13 +101,15 @@ const AddSpecimen = () => {
     const isSelectedTestAlreadyAdded = savedTestNames.includes(
       selectedTest.name
     );
-    const savedTestIds = savedSelectedDatas.map((data) => data.id);
+    const savedTestIds = savedSelectedDatas.map((data) => data.testId);
     const isSelectedTestCantBeAdded = savedTestIds.includes(selectedTest.id);
 
     if (isSelectedTestCantBeAdded) {
-      return alert(
-        `${selectedTest?.name} can't be added, because the test is already inside the package`
-      );
+      notification.warning({
+        message: "Failed to add test",
+        description: `${selectedTest.name} is already inside in one of the added labtest`,
+        placement: "bottomRight",
+      });
     }
 
     if (!isSelectedTestAlreadyAdded && !isSelectedTestCantBeAdded) {
@@ -126,6 +129,7 @@ const AddSpecimen = () => {
           );
           const isSpecimenPlenty = response?.data?.labTestSpecimens?.length > 1;
           const specimensToAdd = getSpecimenRecursively(response?.data);
+          const testIdsToAdd = getTestIdRecursively(response?.data);
 
           if (isSpecimenPlenty && selectedTest.type === "Test") {
             setOpenSpecimenModal(true);
@@ -135,11 +139,19 @@ const AddSpecimen = () => {
               )
             );
           } else {
-            //If the type of specimen is an array then dont display that to the UI
             const testToBeAdded = {
               type: response.data?.type,
               id: response.data?.id,
               name: response.data?.name,
+              key:
+                response.data?.child?.length > 0
+                  ? [...new Set(specimensToAdd.map((data) => data.specimen))]
+                  : [
+                      response.data?.labTestSpecimens
+                        ?.map((data) => data.specimen.name)
+                        .toString()
+                        .replace(/,/g, " "),
+                    ],
               specimen:
                 response.data?.child?.length > 0
                   ? [...new Set(specimensToAdd.map((data) => data.specimen))]
@@ -176,19 +188,26 @@ const AddSpecimen = () => {
                 ) {
                   setSavedSpecimensArr((prevArr) => [
                     ...prevArr,
-                    { specimen: specimen.specimen },
-                  ]);
-                  setSavedSelectedDatas((prevDatas) => [
-                    ...prevDatas,
-                    { testId: specimen.testId },
+                    { specimen: specimen.specimen, key: specimen.specimen },
                   ]);
                 }
+              });
+
+              testIdsToAdd.map((test) => {
+                setSavedSelectedDatas((prevDatas) => [
+                  ...prevDatas,
+                  { testId: test.testId },
+                ]);
               });
             } else {
               if (isSpecimenCanBeAdded) {
                 setSavedSpecimensArr([
                   ...savedSpecimensArr,
                   {
+                    key: response.data?.labTestSpecimens
+                      ?.map((data) => data.specimen.name)
+                      .toString()
+                      .replace(/,/g, " "),
                     specimen: response.data?.labTestSpecimens
                       ?.map((data) => data.specimen.name)
                       .toString()
@@ -214,7 +233,6 @@ const AddSpecimen = () => {
         item?.labTestSpecimens.map((specimenData) => {
           const specimenName = specimenData.specimen.name;
           selectedSpecimens[specimenName] = {
-            testId: item.id,
             specimen: specimenName,
           };
         });
@@ -231,6 +249,25 @@ const AddSpecimen = () => {
     });
 
     return Object.values(selectedSpecimens);
+  };
+
+  const getTestIdRecursively = (data) => {
+    const selectedTestIds = [];
+
+    data?.child?.map((item) => {
+      if (item?.labTestSpecimens) {
+        selectedTestIds.push({
+          testId: item?.id,
+        });
+      }
+
+      if (item?.child && item?.child?.length > 0) {
+        const childSpecimens = getTestIdRecursively(item);
+        selectedTestIds.push(...childSpecimens);
+      }
+    });
+
+    return selectedTestIds;
   };
 
   const handleDeleteTestInArr = (selectedTest) => {
@@ -349,6 +386,7 @@ const AddSpecimen = () => {
           </FormControl>
         ))}
       </Modal>
+      <Button type="primary">Submit Order</Button>
     </div>
   );
 };
