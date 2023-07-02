@@ -143,6 +143,10 @@ const AddSpecimen = () => {
               type: response.data?.type,
               id: response.data?.id,
               name: response.data?.name,
+              testIds:
+                response.data?.child?.length > 0
+                  ? testIdsToAdd.map((test) => test.testId)
+                  : null,
               key:
                 response.data?.child?.length > 0
                   ? [...new Set(specimensToAdd.map((data) => data.specimen))]
@@ -295,6 +299,11 @@ const AddSpecimen = () => {
         )
     );
     setSavedSpecimensArr(filteredSpecimens);
+
+    const filteredTestIds = savedSelectedDatas.filter(
+      (data) => !selectedTest?.testIds.includes(data.testId)
+    );
+    setSavedSelectedDatas(filteredTestIds);
   };
 
   return (
