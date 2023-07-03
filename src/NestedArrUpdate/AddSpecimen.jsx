@@ -9,7 +9,8 @@ import {
 import { Modal, Button, notification } from "antd";
 import axios from "axios";
 import React, { useState } from "react";
-
+import { useDispatch, useSelector } from "react-redux";
+import { handleChangeLabtestData } from "../slice/SavedLabTestSlice";
 export const labTestLookup = [
   {
     id: 555,
@@ -54,13 +55,12 @@ export const labTestLookup = [
 ];
 
 const AddSpecimen = () => {
-  const [savedTestArr, setSavedTestArr] = useState([]);
-  const [savedSpecimensArr, setSavedSpecimensArr] = useState([]);
   const [specimenOptions, setSpecimenOptions] = useState([]);
   const [openSpecimenModal, setOpenSpecimenModal] = useState(false);
   const [selectedSpecimen, setSelectedSpecimen] = useState([]);
-  const [savedSelectedDatas, setSavedSelectedDatas] = useState([]);
   const [selectedTestDatas, setSelectedTestDatas] = useState(null);
+  const savedLabtests = useSelector((state) => state.savedLabtests);
+  const dispatch = useDispatch();
 
   const handleSelectSpecimen = (e) => {
     const { value } = e.target;
@@ -74,34 +74,52 @@ const AddSpecimen = () => {
   };
 
   const handleSubmitSpecimen = () => {
-    const specimenNamesSaved = savedSpecimensArr.map((data) => data.specimen);
+    const savedSpecimenNames = savedLabtests.savedSpecimensArr?.map(
+      (data) => data.specimen
+    );
 
-    setSavedTestArr([
-      ...savedTestArr,
-      {
-        type: selectedTestDatas?.type,
-        id: selectedTestDatas?.id,
-        name: selectedTestDatas?.name,
-        specimen: selectedSpecimen,
-        key: selectedSpecimen,
-      },
-    ]);
-    selectedSpecimen
-      .filter((val) => !specimenNamesSaved.includes(val))
-      .map((val) =>
-        setSavedSpecimensArr((prevArr) => [
-          ...prevArr,
-          { specimen: val, key: val },
-        ])
+    dispatch(
+      handleChangeLabtestData({
+        savedTestArr: [
+          ...savedLabtests.savedTestArr,
+          {
+            type: selectedTestDatas?.type,
+            id: selectedTestDatas?.id,
+            name: selectedTestDatas?.name,
+            specimen: selectedSpecimen,
+            key: selectedSpecimen,
+          },
+        ],
+      })
+    );
+
+    const filteredSelectedSpecimen = selectedSpecimen.filter(
+      (val) => !savedSpecimenNames.includes(val)
+    );
+
+    if (filteredSelectedSpecimen.length > 0) {
+      dispatch(
+        handleChangeLabtestData({
+          savedSpecimensArr: [
+            ...savedLabtests.savedSpecimensArr,
+            ...filteredSelectedSpecimen.map((val) => ({
+              key: val,
+              specimen: val,
+            })),
+          ],
+        })
       );
+    }
     setOpenSpecimenModal(false);
   };
   const handleAddTestAndSpecimenInArr = async (selectedTest) => {
-    const savedTestNames = savedTestArr?.map((test) => test.name);
+    const savedTestNames = savedLabtests.savedTestArr?.map((test) => test.name);
     const isSelectedTestAlreadyAdded = savedTestNames.includes(
       selectedTest.name
     );
-    const savedTestIds = savedSelectedDatas.map((data) => data.testId);
+    const savedTestIds = savedLabtests.savedSelectedDatas.map(
+      (data) => data.testId
+    );
     const isSelectedTestCantBeAdded = savedTestIds.includes(selectedTest.id);
 
     if (isSelectedTestCantBeAdded) {
@@ -117,14 +135,14 @@ const AddSpecimen = () => {
         .get(`http://localhost:8000/labTest/${selectedTest.id}`)
         .then((response) => {
           setSelectedTestDatas(response?.data);
-          const specimenNamesSaved = savedSpecimensArr.map(
+          const savedSpecimenNames = savedLabtests.savedSpecimensArr?.map(
             (data) => data.specimen
           );
           const selectedSpecimenFromApi = response?.data?.labTestSpecimens
             ?.map((data) => data.specimen.name)
             .toString()
             .replace(/,/g, " ");
-          const isSpecimenCanBeAdded = !specimenNamesSaved.includes(
+          const isSpecimenCanBeAdded = !savedSpecimenNames.includes(
             selectedSpecimenFromApi
           );
           const isSpecimenPlenty = response?.data?.labTestSpecimens?.length > 1;
@@ -167,57 +185,87 @@ const AddSpecimen = () => {
                     ],
             };
 
-            setSavedTestArr([...savedTestArr, testToBeAdded]);
+            dispatch(
+              handleChangeLabtestData({
+                savedTestArr: [...savedLabtests.savedTestArr, testToBeAdded],
+              })
+            );
 
             if (selectedTest.type !== "Test") {
               const childTestIds = testIdsToAdd.map((data) => data.testId);
-              const filteredSavedTest = savedTestArr.filter(
+              const filteredSavedTest = savedLabtests.savedTestArr?.filter(
                 (data) => !childTestIds.includes(data.id)
               );
-              setSavedTestArr([...filteredSavedTest, testToBeAdded]);
+              dispatch(
+                handleChangeLabtestData({
+                  savedTestArr: [...filteredSavedTest, testToBeAdded],
+                })
+              );
             }
             if (response?.data?.child?.length > 0) {
-              specimensToAdd.map((specimen) => {
-                if (
-                  !savedSpecimensArr.find((data) =>
+              const filteredSpecimensToAdd = specimensToAdd.filter(
+                (specimen) => {
+                  return !savedLabtests.savedSpecimensArr.some((data) =>
                     specimen.specimen.includes(data.specimen)
-                  )
-                ) {
-                  setSavedSpecimensArr((prevArr) => [
-                    ...prevArr,
-                    { specimen: specimen.specimen, key: specimen.specimen },
-                  ]);
+                  );
                 }
-              });
+              );
+              if (filteredSpecimensToAdd.length > 0) {
+                dispatch(
+                  handleChangeLabtestData({
+                    savedSpecimensArr: [
+                      ...savedLabtests.savedSpecimensArr,
+                      ...filteredSpecimensToAdd.map((data) => ({
+                        specimen: data.specimen,
+                        key: data.specimen,
+                      })),
+                    ],
+                  })
+                );
+              }
 
-              testIdsToAdd
-                .filter((data) => !savedTestIds.includes(data.testId))
-                .map((test) => {
-                  setSavedSelectedDatas((prevDatas) => [
-                    ...prevDatas,
-                    { testId: test.testId },
-                  ]);
-                });
+              const filteredTestIdsToAdd = testIdsToAdd.filter(
+                (data) => !savedTestIds.includes(data.testId)
+              );
+
+              dispatch(
+                handleChangeLabtestData({
+                  savedSelectedDatas: [
+                    ...savedLabtests.savedSelectedDatas,
+                    ...filteredTestIdsToAdd.map((data) => ({
+                      testId: data.testId,
+                    })),
+                  ],
+                })
+              );
             } else {
               if (isSpecimenCanBeAdded) {
-                setSavedSpecimensArr([
-                  ...savedSpecimensArr,
-                  {
-                    key: response.data?.labTestSpecimens
-                      ?.map((data) => data.specimen.name)
-                      .toString()
-                      .replace(/,/g, " "),
-                    specimen: response.data?.labTestSpecimens
-                      ?.map((data) => data.specimen.name)
-                      .toString()
-                      .replace(/,/g, " "),
-                  },
-                ]);
+                dispatch(
+                  handleChangeLabtestData({
+                    savedSpecimensArr: [
+                      ...savedLabtests.savedSpecimensArr,
+                      {
+                        key: response.data?.labTestSpecimens
+                          ?.map((data) => data.specimen.name)
+                          .toString()
+                          .replace(/,/g, " "),
+                        specimen: response.data?.labTestSpecimens
+                          ?.map((data) => data.specimen.name)
+                          .toString()
+                          .replace(/,/g, " "),
+                      },
+                    ],
+                  })
+                );
               }
-              setSavedSelectedDatas([
-                ...savedSelectedDatas,
-                { testId: response?.data?.id },
-              ]);
+              dispatch(
+                handleChangeLabtestData({
+                  savedSelectedDatas: [
+                    ...savedLabtests.savedSelectedDatas,
+                    { testId: response?.data?.id },
+                  ],
+                })
+              );
             }
           }
         });
@@ -270,47 +318,68 @@ const AddSpecimen = () => {
   };
 
   const handleDeleteTestInArr = (selectedTest) => {
-    const filteredSavedTest = savedSelectedDatas.filter(
+    const filteredSavedTestDatas = savedLabtests.savedSelectedDatas.filter(
       (data) => data.testId !== selectedTest.id
     );
-    setSavedSelectedDatas(filteredSavedTest);
-    const filteredTest = savedTestArr.filter(
+    dispatch(
+      handleChangeLabtestData({
+        savedSelectedDatas: filteredSavedTestDatas,
+      })
+    );
+
+    const filteredTest = savedLabtests.savedTestArr?.filter(
       (test) => test.id !== selectedTest.id
     );
-    setSavedTestArr(filteredTest);
+    dispatch(
+      handleChangeLabtestData({
+        savedTestArr: filteredTest,
+      })
+    );
 
-    const specimensToRemove = savedSpecimensArr.filter((data) => {
-      const isSpecimenPresentInOtherTests = savedTestArr.some(
-        (test) => test !== selectedTest && test.specimen.includes(data.specimen)
-      );
+    const specimensToRemove = savedLabtests.savedSpecimensArr?.filter(
+      (data) => {
+        const isSpecimenPresentInOtherTests = savedLabtests.savedTestArr?.some(
+          (test) =>
+            test !== selectedTest && test.specimen.includes(data.specimen)
+        );
 
-      return !isSpecimenPresentInOtherTests;
-    });
+        return !isSpecimenPresentInOtherTests;
+      }
+    );
 
-    const filteredSpecimens = savedSpecimensArr.filter(
+    const filteredSpecimens = savedLabtests.savedSpecimensArr.filter(
       (data) =>
         !specimensToRemove.some(
           (specimen) => specimen.specimen === data.specimen
         )
     );
-    setSavedSpecimensArr(filteredSpecimens);
+
+    dispatch(
+      handleChangeLabtestData({
+        savedSpecimensArr: filteredSpecimens,
+      })
+    );
 
     const filteredTestIds = savedSelectedDatas.filter(
       (data) => !selectedTest?.testIds.includes(data.testId)
     );
-    setSavedSelectedDatas(filteredTestIds);
+    dispatch(
+      handleChangeLabtestData({
+        savedSelectedDatas: filteredTestIds,
+      })
+    );
   };
 
   return (
     <div style={{ marginBottom: "6rem" }}>
       <h1>Add Specimen</h1>
       <h3>SAVED ID'S</h3>
-      <pre>{JSON.stringify(savedSelectedDatas, null, 4)}</pre>
+      <pre>{JSON.stringify(savedLabtests.savedSelectedDatas, null, 4)}</pre>
       <h3>DATA THAT IS BEING SELECTED</h3>
-      <pre>{JSON.stringify(savedTestArr, null, 4)}</pre>
+      <pre>{JSON.stringify(savedLabtests.savedTestArr, null, 4)}</pre>
       <br />
       <h3>Saved Specimens</h3>
-      <pre>{JSON.stringify(savedSpecimensArr, null, 4)}</pre>
+      <pre>{JSON.stringify(savedLabtests.savedSpecimensArr, null, 4)}</pre>
       <br />
       <Autocomplete
         getOptionLabel={(option) => option.name}
@@ -332,7 +401,7 @@ const AddSpecimen = () => {
           <th>Action</th>
         </thead>
         <tbody>
-          {savedTestArr?.map((test) => (
+          {savedLabtests.savedTestArr?.map((test) => (
             <tr key={test.id}>
               <td style={{ color: "green", paddingLeft: "2rem" }}>
                 {test.name}
@@ -357,7 +426,7 @@ const AddSpecimen = () => {
           <th style={{ borderRight: "1px solid red" }}>Specimen Name</th>
         </thead>
         <tbody>
-          {savedSpecimensArr?.map((data) => (
+          {savedLabtests.savedSpecimensArr?.map((data) => (
             <tr key={data}>
               <td style={{ color: "green", paddingLeft: "2rem" }}>
                 {data.specimen}
