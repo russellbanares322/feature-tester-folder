@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { Modal, Button, notification } from "antd";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { handleChangeLabtestData } from "../slice/SavedLabTestSlice";
 export const labTestLookup = [
@@ -96,20 +96,17 @@ const AddSpecimen = () => {
     const filteredSelectedSpecimen = selectedSpecimen.filter(
       (val) => !savedSpecimenNames.includes(val)
     );
-
-    if (filteredSelectedSpecimen.length > 0) {
-      dispatch(
-        handleChangeLabtestData({
-          savedSpecimensArr: [
-            ...savedLabtests.savedSpecimensArr,
-            ...filteredSelectedSpecimen.map((val) => ({
-              key: val,
-              specimen: val,
-            })),
-          ],
-        })
-      );
-    }
+    dispatch(
+      handleChangeLabtestData({
+        savedSpecimensArr: [
+          ...savedLabtests.savedSpecimensArr,
+          ...filteredSelectedSpecimen.map((val) => ({
+            key: val,
+            specimen: val,
+          })),
+        ],
+      })
+    );
     setOpenSpecimenModal(false);
   };
   const handleAddTestAndSpecimenInArr = async (selectedTest) => {
@@ -210,19 +207,18 @@ const AddSpecimen = () => {
                   );
                 }
               );
-              if (filteredSpecimensToAdd.length > 0) {
-                dispatch(
-                  handleChangeLabtestData({
-                    savedSpecimensArr: [
-                      ...savedLabtests.savedSpecimensArr,
-                      ...filteredSpecimensToAdd.map((data) => ({
-                        specimen: data.specimen,
-                        key: data.specimen,
-                      })),
-                    ],
-                  })
-                );
-              }
+
+              dispatch(
+                handleChangeLabtestData({
+                  savedSpecimensArr: [
+                    ...savedLabtests.savedSpecimensArr,
+                    ...filteredSpecimensToAdd.map((data) => ({
+                      specimen: data.specimen,
+                      key: data.specimen,
+                    })),
+                  ],
+                })
+              );
 
               const filteredTestIdsToAdd = testIdsToAdd.filter(
                 (data) => !savedTestIds.includes(data.testId)
@@ -272,28 +268,21 @@ const AddSpecimen = () => {
     }
   };
 
-  const getSpecimenRecursively = (data) => {
-    const selectedSpecimens = {};
+  const getSpecimenRecursively = (data, selectedSpecimens = {}) => {
+    if (data?.labTestSpecimens) {
+      data.labTestSpecimens?.map((specimenData) => {
+        const specimenName = specimenData.specimen.name;
+        selectedSpecimens[specimenName] = {
+          specimen: specimenName,
+        };
+      });
+    }
 
-    data?.child?.map((item) => {
-      if (item?.labTestSpecimens) {
-        item?.labTestSpecimens.map((specimenData) => {
-          const specimenName = specimenData.specimen.name;
-          selectedSpecimens[specimenName] = {
-            specimen: specimenName,
-          };
-        });
-      }
-
-      if (item?.child && item.child.length > 0) {
-        const childSpecimens = getSpecimenRecursively(item);
-        Object.entries(childSpecimens).map(([specimenName, specimenData]) => {
-          if (!selectedSpecimens[specimenName]) {
-            selectedSpecimens[specimenName] = specimenData;
-          }
-        });
-      }
-    });
+    if (data?.child && data.child.length > 0) {
+      data.child.map((item) => {
+        getSpecimenRecursively(item, selectedSpecimens);
+      });
+    }
 
     return Object.values(selectedSpecimens);
   };

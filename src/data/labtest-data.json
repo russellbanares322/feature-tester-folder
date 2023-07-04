@@ -6,22 +6,22 @@
       "name": "First Package",
       "child": [
         {
-          "id": 888,
+          "id": 187,
           "type": "Test",
-          "name": "First Test",
+          "name": "Inside Test",
           "testDetails": {
             "isStatAllowed": true,
             "requiresBloodDraw": false
           },
           "labTestSpecimens":[
               {
-                "id": "MMY",
+                "id": "XXC",
                 "specimen":{
-                  "name": "Serum"
+                  "name": "Xamaxi"
                 }
               }
           ],
-          "child": []
+          "child":[]
         },
         {
           "id": 557,
@@ -52,22 +52,22 @@
               "name": "Shadow Profile",
               "child":[
                 {
-                  "id": 187,
+                  "id": 888,
                   "type": "Test",
-                  "name": "Inside Test",
+                  "name": "First Test",
                   "testDetails": {
                     "isStatAllowed": true,
                     "requiresBloodDraw": false
                   },
                   "labTestSpecimens":[
                       {
-                        "id": "XXC",
+                        "id": "MMY",
                         "specimen":{
-                          "name": "Xamaxi"
+                          "name": "Serum"
                         }
                       }
                   ],
-                  "child":[]
+                  "child": []
                 }
               ]
             },
