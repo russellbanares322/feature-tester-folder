@@ -118,11 +118,21 @@ const AddSpecimen = () => {
       (data) => data.testId
     );
     const isSelectedTestCantBeAdded = savedTestIds.includes(selectedTest.id);
+    const parentLabtestName = savedLabtests?.savedTestArr?.filter((test) =>
+      test?.testIds?.includes(selectedTest.id)
+    );
 
     if (isSelectedTestCantBeAdded) {
       notification.warning({
         message: "Failed to add test",
-        description: `${selectedTest.name} is already inside in one of the added labtest`,
+        description: (
+          <>
+            <strong> {selectedTest.name}</strong> is already inside of{" "}
+            <strong>
+              {parentLabtestName.map((test) => test.name).join(",")}
+            </strong>
+          </>
+        ),
         placement: "bottomRight",
       });
     }
@@ -193,11 +203,33 @@ const AddSpecimen = () => {
               const filteredSavedTest = savedLabtests.savedTestArr?.filter(
                 (data) => !childTestIds.includes(data.id)
               );
+              const testToBeRemoved = savedLabtests.savedTestArr.filter(
+                (data) => childTestIds.includes(data.id)
+              );
+
+              console.log(testToBeRemoved);
               dispatch(
                 handleChangeLabtestData({
                   savedTestArr: [...filteredSavedTest, testToBeAdded],
                 })
               );
+              if (testToBeRemoved.length > 0) {
+                notification.warning({
+                  message: "Failed to add test",
+                  description: (
+                    <>
+                      <strong>
+                        {" "}
+                        {testToBeRemoved.map((test) => test.name).join(",")}
+                      </strong>{" "}
+                      {testToBeRemoved.length > 1 ? "are" : "is"} removed
+                      because it is inside of{" "}
+                      <strong>{response?.data?.name}</strong>
+                    </>
+                  ),
+                  placement: "bottomRight",
+                });
+              }
             }
             if (response?.data?.child?.length > 0) {
               const filteredSpecimensToAdd = specimensToAdd.filter(
