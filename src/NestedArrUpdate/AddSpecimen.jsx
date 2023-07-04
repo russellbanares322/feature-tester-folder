@@ -129,7 +129,7 @@ const AddSpecimen = () => {
           <>
             <strong> {selectedTest.name}</strong> is already inside of{" "}
             <strong>
-              {parentLabtestName.map((test) => test.name).join(",")}
+              {parentLabtestName.map((test) => test.name).join(", ")}
             </strong>
           </>
         ),
@@ -207,7 +207,6 @@ const AddSpecimen = () => {
                 (data) => childTestIds.includes(data.id)
               );
 
-              console.log(testToBeRemoved);
               dispatch(
                 handleChangeLabtestData({
                   savedTestArr: [...filteredSavedTest, testToBeAdded],
@@ -220,7 +219,7 @@ const AddSpecimen = () => {
                     <>
                       <strong>
                         {" "}
-                        {testToBeRemoved.map((test) => test.name).join(",")}
+                        {testToBeRemoved.map((test) => test.name).join(", ")}
                       </strong>{" "}
                       {testToBeRemoved.length > 1 ? "are" : "is"} removed
                       because it is inside of{" "}
