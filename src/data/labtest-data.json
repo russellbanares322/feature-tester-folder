@@ -18,7 +18,25 @@
                 "id": "XXC",
                 "specimen":{
                   "name": "Xamaxi"
-                }
+                },
+                "testVolumeOrSizeRequirements": [
+                  {
+                    "minTest": 2,
+                    "maxTest": 3,
+                    "minVolume": 5,
+                    "minSize": null,
+                    "uoM": "volume"
+                  
+                  },
+                  {
+                    "minTest": 2,
+                    "maxTest": 4,
+                    "minVolume": 6,
+                    "minSize": null,
+                    "uoM": "volume"
+                  
+                  }
+                ]
               }
           ],
           "child":[]
@@ -36,7 +54,27 @@
                 "id": "MMY",
                 "specimen":{
                   "name": "Serum"
-                }
+                },
+                "testVolumeOrSizeRequirements": [
+                  {
+                    "id": 1,
+                    "minTest": 1,
+                    "maxTest": 3,
+                    "minVolume": 6.73,
+                    "minSize": null,
+                    "uoM": "volume"
+                  
+                  },
+                  {
+                    "id": 2,
+                    "minTest": 1,
+                    "maxTest": 3,
+                    "minVolume": 6.17,
+                    "minSize": null,
+                    "uoM": "volume"
+                  
+                  }
+                ]
               }
           ],
           "child": []
@@ -64,7 +102,8 @@
                         "id": "MMY",
                         "specimen":{
                           "name": "Serum"
-                        }
+                        },
+                        "testVolumeOrSizeRequirements":[]
                       }
                   ],
                   "child": []
@@ -84,7 +123,8 @@
                     "id": "BCX",
                     "specimen":{
                       "name": "Whole blood"
-                    }
+                    },
+                    "testVolumeOrSizeRequirements":[]
                   }
               ],
               "child": []
@@ -102,7 +142,8 @@
                   "id": "HHK",
                   "specimen":{
                     "name": "Xyz Specimen"
-                  }
+                  },
+                  "testVolumeOrSizeRequirements":[]
                 }
             ],
               "child": []
@@ -142,7 +183,8 @@
                   "id": "SSD",
                   "specimen":{
                     "name": "Slide"
-                  }
+                  },
+                  "testVolumeOrSizeRequirements":[]
                 }
             ],
       "child": []
@@ -160,7 +202,27 @@
             "id": "MMY",
             "specimen":{
               "name": "Serum"
-            }
+            },
+            "testVolumeOrSizeRequirements": [
+              {
+                "id": 1,
+                "minTest": 1,
+                "maxTest": 3,
+                "minVolume": 6.73,
+                "minSize": null,
+                "uoM": "volume"
+              
+              },
+              {
+                "id": 2,
+                "minTest": 1,
+                "maxTest": 3,
+                "minVolume": 6.17,
+                "minSize": null,
+                "uoM": "volume"
+              
+              }
+            ]
           }
       ],
       "child": []
@@ -178,27 +240,46 @@
             "id": "MMY",
             "specimen":{
               "name": "Serum"
-            }
+            },
+            "testVolumeOrSizeRequirements":[]
           }
       ],
       "child": []
     },
     {
-      "id": 187,
-      "type": "Test",
-      "name": "Inside Test",
-      "testDetails": {
-        "isStatAllowed": true,
-        "requiresBloodDraw": false
-      },
-      "labTestSpecimens":[
-          {
-            "id": "XXC",
-            "specimen":{
-              "name": "Xamaxi"
-            }
-          }
-      ],
+          "id": 187,
+          "type": "Test",
+          "name": "Inside Test",
+          "testDetails": {
+            "isStatAllowed": true,
+            "requiresBloodDraw": false
+          },
+            "labTestSpecimens":[
+              {
+                "id": "XXC",
+                "specimen":{
+                  "name": "Xamaxi"
+                },
+                "testVolumeOrSizeRequirements": [
+                  {
+                    "minTest": 2,
+                    "maxTest": 3,
+                    "minVolume": 5,
+                    "minSize": null,
+                    "uoM": "volume"
+                  
+                  },
+                  {
+                    "minTest": 2,
+                    "maxTest": 4,
+                    "minVolume": 6,
+                    "minSize": null,
+                    "uoM": "volume"
+                  
+                  }
+                ]
+              }
+          ],
       "child":[]
     },
     {
@@ -214,7 +295,9 @@
             "id": "BCX",
             "specimen":{
               "name": "Whole blood"
-            }
+            },
+            "testVolumeOrSizeRequirements": []
+            
           }
       ],
       "child": []
@@ -232,7 +315,8 @@
           "id": "HHK",
           "specimen":{
             "name": "Xyz Specimen"
-          }
+          },
+          "testVolumeOrSizeRequirements":[]
         }
     ],
       "child": []
@@ -250,13 +334,15 @@
         "id": "MMK",
         "specimen":{
           "name": "Maxmo Specimen"
-        }
+        },
+        "testVolumeOrSizeRequirements":[]
       },
       {
         "id": "PDF",
         "specimen":{
           "name": "Pudgero Specimen"
-        }
+        },
+        "testVolumeOrSizeRequirements":[]
       }
   ],
   "child": []

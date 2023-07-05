@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { Modal, Button, notification } from "antd";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { handleChangeLabtestData } from "../slice/SavedLabTestSlice";
 export const labTestLookup = [
@@ -74,7 +74,7 @@ const AddSpecimen = () => {
   };
 
   const handleSubmitSpecimen = () => {
-    const savedSpecimenNames = savedLabtests.savedSpecimensArr?.map(
+    const savedSpecimenNames = savedLabtests?.savedSpecimensArr?.map(
       (data) => data.specimen
     );
 
@@ -245,7 +245,8 @@ const AddSpecimen = () => {
                     ...savedLabtests.savedSpecimensArr,
                     ...filteredSpecimensToAdd.map((data) => ({
                       specimen: data.specimen,
-                      key: data.specimen,
+                      key: data.key,
+                      specimenQuantity: data.specimenQuantity[0],
                     })),
                   ],
                 })
@@ -280,6 +281,9 @@ const AddSpecimen = () => {
                           ?.map((data) => data.specimen.name)
                           .toString()
                           .replace(/,/g, " "),
+                        specimenQuantity: response?.data?.labTestSpecimens.map(
+                          (data) => data.testVolumeOrSizeRequirements
+                        )[0],
                       },
                     ],
                   })
@@ -301,10 +305,14 @@ const AddSpecimen = () => {
 
   const getSpecimenRecursively = (data, selectedSpecimens = {}) => {
     if (data?.labTestSpecimens) {
-      data.labTestSpecimens?.map((specimenData) => {
+      data?.labTestSpecimens?.map((specimenData) => {
         const specimenName = specimenData.specimen.name;
         selectedSpecimens[specimenName] = {
           specimen: specimenName,
+          key: specimenName,
+          specimenQuantity: data?.labTestSpecimens.map(
+            (specimen) => specimen.testVolumeOrSizeRequirements
+          )[0],
         };
       });
     }
@@ -444,12 +452,19 @@ const AddSpecimen = () => {
       <table>
         <thead>
           <th style={{ borderRight: "1px solid red" }}>Specimen Name</th>
+          <th style={{ borderRight: "1px solid red" }}>Qty/Volume</th>
         </thead>
         <tbody>
           {savedLabtests.savedSpecimensArr?.map((data) => (
             <tr key={data}>
               <td style={{ color: "green", paddingLeft: "2rem" }}>
                 {data.specimen}
+              </td>
+              <td style={{ color: "green", paddingLeft: "2rem" }}>
+                {
+                  data.specimenQuantity.find((data) => Math.min(data.minTest))
+                    ?.minVolume
+                }
               </td>
             </tr>
           ))}
