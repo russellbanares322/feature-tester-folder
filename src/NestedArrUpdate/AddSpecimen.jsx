@@ -1,5 +1,6 @@
 import {
   Autocomplete,
+  Box,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -11,6 +12,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { handleChangeLabtestData } from "../slice/SavedLabTestSlice";
+
 export const labTestLookup = [
   {
     id: 555,
@@ -54,11 +56,17 @@ export const labTestLookup = [
   },
 ];
 
+export const inputTypeOptions = ["text", "number", "date"];
+
 const AddSpecimen = () => {
   const [specimenOptions, setSpecimenOptions] = useState([]);
   const [openSpecimenModal, setOpenSpecimenModal] = useState(false);
   const [selectedSpecimen, setSelectedSpecimen] = useState([]);
   const [selectedTestDatas, setSelectedTestDatas] = useState(null);
+  const [inputValues, setInputValues] = useState([]);
+  const [selectedLabtestRequirements, setSelectedLabtestRequirements] =
+    useState([]);
+  const [showLabReqModal, setShowLabReqModal] = useState(false);
   const savedLabtests = useSelector((state) => state.savedLabtests);
   const dispatch = useDispatch();
 
@@ -145,24 +153,52 @@ const AddSpecimen = () => {
           const savedSpecimenNames = savedLabtests.savedSpecimensArr?.map(
             (data) => data.specimen
           );
-          const selectedSpecimenFromApi = response?.data?.labTestSpecimens
-            ?.map((data) => data.specimen.name)
-            .toString()
-            .replace(/,/g, " ");
+          const selectedSpecimenFromApi =
+            response?.data?.testDetails?.labTestSpecimens
+              ?.map((data) => data.specimen.name)
+              .toString()
+              .replace(/,/g, " ");
           const isSpecimenCanBeAdded = !savedSpecimenNames.includes(
             selectedSpecimenFromApi
           );
-          const isSpecimenPlenty = response?.data?.labTestSpecimens?.length > 1;
+          const isSpecimenPlenty =
+            response?.data?.testDetails?.labTestSpecimens?.length > 1;
           const specimensToAdd = getSpecimenRecursively(response?.data);
           const testIdsToAdd = getTestIdRecursively(response?.data);
+          const childLabTestRequirements = getLabtestRequirementsRecursively(
+            response?.data
+          );
 
-          if (isSpecimenPlenty && selectedTest.type === "Test") {
+          console.log(childLabTestRequirements);
+
+          if (
+            isSpecimenPlenty &&
+            selectedTest.type === "Test" &&
+            childLabTestRequirements.length === 0
+          ) {
             setOpenSpecimenModal(true);
             setSpecimenOptions(
-              response?.data?.labTestSpecimens?.map(
+              response?.data?.testDetails?.labTestSpecimens?.map(
                 (data) => data?.specimen?.name
               )
             );
+          } else if (
+            childLabTestRequirements.length > 0 &&
+            response?.data?.child.length > 0 &&
+            selectedTest.type !== "Test"
+          ) {
+            setShowLabReqModal(true);
+            childLabTestRequirements.map((test) => {
+              setSelectedLabtestRequirements((prevLabtestReq) => [
+                ...prevLabtestReq,
+                {
+                  id: test.id,
+                  requirementType: test.requirementType,
+                  isRequired: test.isRequired,
+                  requirementDetails: test.requirementDetails,
+                },
+              ]);
+            });
           } else {
             const testToBeAdded = {
               type: response.data?.type,
@@ -176,7 +212,7 @@ const AddSpecimen = () => {
                 response.data?.child?.length > 0
                   ? [...new Set(specimensToAdd.map((data) => data.specimen))]
                   : [
-                      response.data?.labTestSpecimens
+                      response.data?.testDetails?.labTestSpecimens
                         ?.map((data) => data.specimen.name)
                         .toString()
                         .replace(/,/g, " "),
@@ -185,7 +221,7 @@ const AddSpecimen = () => {
                 response.data?.child?.length > 0
                   ? [...new Set(specimensToAdd.map((data) => data.specimen))]
                   : [
-                      response.data?.labTestSpecimens
+                      response.data?.testDetails?.labTestSpecimens
                         ?.map((data) => data.specimen.name)
                         .toString()
                         .replace(/,/g, " "),
@@ -246,7 +282,7 @@ const AddSpecimen = () => {
                     ...filteredSpecimensToAdd.map((data) => ({
                       specimen: data.specimen,
                       key: data.key,
-                      specimenQuantity: data.specimenQuantity[0],
+                      specimenQuantity: data.specimenQuantity,
                     })),
                   ],
                 })
@@ -273,17 +309,18 @@ const AddSpecimen = () => {
                     savedSpecimensArr: [
                       ...savedLabtests.savedSpecimensArr,
                       {
-                        key: response.data?.labTestSpecimens
+                        key: response.data?.testDetails?.labTestSpecimens
                           ?.map((data) => data.specimen.name)
                           .toString()
                           .replace(/,/g, " "),
-                        specimen: response.data?.labTestSpecimens
+                        specimen: response.data?.testDetails?.labTestSpecimens
                           ?.map((data) => data.specimen.name)
                           .toString()
                           .replace(/,/g, " "),
-                        specimenQuantity: response?.data?.labTestSpecimens.map(
-                          (data) => data.testVolumeOrSizeRequirements
-                        )[0],
+                        specimenQuantity:
+                          response?.data?.testDetails?.labTestSpecimens.map(
+                            (data) => data.testVolumeOrSizeRequirements
+                          )[0],
                       },
                     ],
                   })
@@ -304,13 +341,13 @@ const AddSpecimen = () => {
   };
 
   const getSpecimenRecursively = (data, selectedSpecimens = {}) => {
-    if (data?.labTestSpecimens) {
-      data?.labTestSpecimens?.map((specimenData) => {
+    if (data?.testDetails?.labTestSpecimens) {
+      data?.testDetails?.labTestSpecimens?.map((specimenData) => {
         const specimenName = specimenData.specimen.name;
         selectedSpecimens[specimenName] = {
           specimen: specimenName,
           key: specimenName,
-          specimenQuantity: data?.labTestSpecimens.map(
+          specimenQuantity: data?.testDetails?.labTestSpecimens.map(
             (specimen) => specimen.testVolumeOrSizeRequirements
           )[0],
         };
@@ -330,7 +367,7 @@ const AddSpecimen = () => {
     const selectedTestIds = [];
 
     data?.child?.map((item) => {
-      if (item?.labTestSpecimens) {
+      if (item?.testDetails?.labTestSpecimens) {
         selectedTestIds.push({
           testId: item?.id,
         });
@@ -345,6 +382,30 @@ const AddSpecimen = () => {
     return selectedTestIds;
   };
 
+  const getLabtestRequirementsRecursively = (data) => {
+    let labTestRequirementsData = [];
+
+    data?.child?.map((item) => {
+      if (item?.testDetails?.labTestRequirements) {
+        item?.testDetails?.labTestRequirements.map((test) => {
+          labTestRequirementsData.push({
+            id: test.id,
+            requirementType: test.requirementType,
+            isRequired: test.isRequired,
+            requirementDetails: test.requirementDetails,
+          });
+        });
+      }
+
+      if (item?.child && item?.child?.length > 0) {
+        const childLabTestRequirements =
+          getLabtestRequirementsRecursively(item);
+        labTestRequirementsData.push(...childLabTestRequirements);
+      }
+    });
+
+    return labTestRequirementsData;
+  };
   const handleDeleteTestInArr = (selectedTest) => {
     const filteredSavedTestDatas = savedLabtests.savedSelectedDatas.filter(
       (data) => data.testId !== selectedTest.id
@@ -398,6 +459,25 @@ const AddSpecimen = () => {
     );
   };
 
+  const handleCloseLabReqModal = () => {
+    setShowLabReqModal(false);
+  };
+
+  const handleInputChange = (e, inputId) => {
+    const inputValue = e.target.value;
+
+    setInputValues((prevValues) => {
+      const updatedValues = [...prevValues];
+      const index = updatedValues.findIndex((_, idx) => idx === inputId);
+      if (index !== -1) {
+        updatedValues[index] = { inputId, value: inputValue };
+      } else {
+        updatedValues.push({ inputId, value: inputValue });
+      }
+
+      return updatedValues;
+    });
+  };
   return (
     <div style={{ marginBottom: "6rem" }}>
       <h1>Add Specimen</h1>
@@ -455,14 +535,14 @@ const AddSpecimen = () => {
           <th style={{ borderRight: "1px solid red" }}>Qty/Volume</th>
         </thead>
         <tbody>
-          {savedLabtests.savedSpecimensArr?.map((data) => (
+          {savedLabtests?.savedSpecimensArr?.map((data) => (
             <tr key={data}>
               <td style={{ color: "green", paddingLeft: "2rem" }}>
                 {data.specimen}
               </td>
               <td style={{ color: "green", paddingLeft: "2rem" }}>
                 {
-                  data.specimenQuantity.find((data) => Math.min(data.minTest))
+                  data?.specimenQuantity?.find((data) => Math.min(data.minTest))
                     ?.minVolume
                 }
               </td>
@@ -493,6 +573,33 @@ const AddSpecimen = () => {
             </FormGroup>
           </FormControl>
         ))}
+      </Modal>
+      <Modal
+        title="Dynamic Form"
+        open={showLabReqModal}
+        onCancel={handleCloseLabReqModal}
+      >
+        <Box sx={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}>
+          {selectedLabtestRequirements?.map((input, index) => (
+            <div key={index}>
+              <label>{input.requirementDetails}</label>
+              <TextField
+                key={index}
+                required={input.isRequired}
+                type={
+                  inputTypeOptions.find(
+                    (_, inputTypeIdx) => inputTypeIdx === input.requirementType
+                  )?.type || "text"
+                }
+                value={
+                  inputValues.find((value, inputIdx) => inputIdx === index)
+                    ?.value || ""
+                }
+                onChange={(e) => handleInputChange(e, index)}
+              />
+            </div>
+          ))}
+        </Box>
       </Modal>
       <Button type="primary">Submit Order</Button>
     </div>
