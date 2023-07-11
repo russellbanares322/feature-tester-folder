@@ -1,3 +1,4 @@
+import { Button } from "antd";
 import React, { useState } from "react";
 import { MdDelete } from "react-icons/md";
 const randomData = [
@@ -10,8 +11,58 @@ const randomData = [
     name: "Mick",
   },
 ];
+
+const arrayOne = [
+  {
+    name: "Serum",
+    quantity: 1,
+  },
+  {
+    name: "Skin",
+    quantity: 3,
+  },
+  {
+    name: "Skin",
+    quantity: 0,
+  },
+  {
+    name: "Plasma",
+    quantity: 0,
+  },
+  {
+    name: "Xyz",
+    quantity: 0,
+  },
+  {
+    name: "404",
+    quantity: 0,
+  },
+];
+
+const arrayTwo = [
+  {
+    name: "Serum",
+  },
+  {
+    name: "Serum",
+  },
+  {
+    name: "Serum",
+  },
+  {
+    name: "Skin",
+  },
+  {
+    name: "Plasma",
+  },
+  {
+    name: "Xyz",
+  },
+];
+
 const DragAndDrop = () => {
   const [datas, setDatas] = useState(randomData);
+  const [savedArrData, setSavedArrData] = useState(null);
   const [showDeleteIcon, setShowDeleteIcon] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
@@ -34,8 +85,53 @@ const DragAndDrop = () => {
     setShowDeleteIcon(false);
   };
 
+  const handleAddArrOne = () => {
+    setSavedArrData(arrayOne);
+  };
+  const handleAddArrTwo = () => {
+    setSavedArrData(
+      savedArrData.map((data) => ({
+        ...data,
+        quantity:
+          data.quantity +
+          parseInt(
+            arrayTwo.filter((item) => item.name.includes(data.name)).length
+          ),
+      }))
+    );
+  };
+
   return (
     <div style={{ position: "relative" }}>
+      <h1>ADD ME</h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          margin: "0 0.5rem",
+        }}
+      >
+        <pre>{JSON.stringify(savedArrData, null, 4)}</pre>
+        <pre>{JSON.stringify(arrayTwo, null, 4)}</pre>
+      </div>
+      <br />
+      <br />
+      <Button
+        disabled={savedArrData !== null}
+        onClick={handleAddArrOne}
+        type="primary"
+      >
+        ARRAY ONE
+      </Button>
+      <Button
+        disabled={savedArrData === null}
+        onClick={handleAddArrTwo}
+        type="primary"
+        danger
+      >
+        ARRAY TWO
+      </Button>
       <h1>DRAG AND DROP</h1>
       <div style={{ display: "flex", gap: "1rem" }}>
         {datas.map((data) => (

@@ -4,6 +4,7 @@ const initialState = {
   savedTestArr: [],
   savedSpecimensArr: [],
   savedSelectedDatas: [],
+  specimenCount: [],
 };
 const savedLabtestSlice = createSlice({
   initialState,

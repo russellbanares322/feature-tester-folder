@@ -117,6 +117,7 @@ const AddSpecimen = () => {
     );
     setOpenSpecimenModal(false);
   };
+
   const handleAddTestAndSpecimenInArr = async (selectedTest) => {
     const savedTestNames = savedLabtests.savedTestArr?.map((test) => test.name);
     const isSelectedTestAlreadyAdded = savedTestNames.includes(
@@ -158,6 +159,10 @@ const AddSpecimen = () => {
               ?.map((data) => data.specimen.name)
               .toString()
               .replace(/,/g, " ");
+          const specimenNamesInsideSpecimenCount =
+            savedLabtests?.specimenCount?.map((data) => data.specimenName);
+          const specimenWillIncrease =
+            specimenNamesInsideSpecimenCount?.includes(selectedSpecimenFromApi);
           const isSpecimenCanBeAdded = !savedSpecimenNames.includes(
             selectedSpecimenFromApi
           );
@@ -165,107 +170,158 @@ const AddSpecimen = () => {
             response?.data?.testDetails?.labTestSpecimens?.length > 1;
           const specimensToAdd = getSpecimenRecursively(response?.data);
           const testIdsToAdd = getTestIdRecursively(response?.data);
-          const childLabTestRequirements = getLabtestRequirementsRecursively(
+          const recursiveSpecimenCount = getSpecimenCountRecursively(
             response?.data
           );
+          // const childLabTestRequirements = getLabtestRequirementsRecursively(
+          //   response?.data
+          // );
 
-          console.log(childLabTestRequirements);
+          if (selectedTest.type === "Test") {
+            if (specimenWillIncrease && !isSpecimenPlenty) {
+              dispatch(
+                handleChangeLabtestData({
+                  specimenCount: savedLabtests.specimenCount.map((data) =>
+                    data.specimenName === selectedSpecimenFromApi
+                      ? {
+                          ...data,
+                          quantity: data.quantity + 1,
+                        }
+                      : data
+                  ),
+                })
+              );
+            } else {
+              dispatch(
+                handleChangeLabtestData({
+                  specimenCount: [
+                    ...savedLabtests.specimenCount,
+                    { specimenName: selectedSpecimenFromApi, quantity: 1 },
+                  ],
+                })
+              );
+            }
+          }
 
-          if (
-            isSpecimenPlenty &&
-            selectedTest.type === "Test" &&
-            childLabTestRequirements.length === 0
-          ) {
-            setOpenSpecimenModal(true);
-            setSpecimenOptions(
-              response?.data?.testDetails?.labTestSpecimens?.map(
-                (data) => data?.specimen?.name
-              )
+          // if (
+          //   isSpecimenPlenty &&
+          //   selectedTest.type === "Test" &&
+          //   childLabTestRequirements.length === 0
+          // ) {
+          //   setOpenSpecimenModal(true);
+          //   setSpecimenOptions(
+          //     response?.data?.testDetails?.labTestSpecimens?.map(
+          //       (data) => data?.specimen?.name
+          //     )
+          //   );
+          // } else if (
+          //   childLabTestRequirements.length > 0 &&
+          //   response?.data?.child.length > 0 &&
+          //   selectedTest.type !== "Test"
+          // ) {
+          //   setShowLabReqModal(true);
+          //   childLabTestRequirements.map((test) => {
+          //     setSelectedLabtestRequirements((prevLabtestReq) => [
+          //       ...prevLabtestReq,
+          //       {
+          //         id: test.id,
+          //         requirementType: test.requirementType,
+          //         isRequired: test.isRequired,
+          //         requirementDetails: test.requirementDetails,
+          //       },
+          //     ]);
+          //   });
+          // } else {
+          const testToBeAdded = {
+            type: response.data?.type,
+            id: response.data?.id,
+            name: response.data?.name,
+            testIds:
+              response.data?.child?.length > 0
+                ? testIdsToAdd.map((test) => test.testId)
+                : null,
+            key:
+              response.data?.child?.length > 0
+                ? [...new Set(specimensToAdd.map((data) => data.specimen))]
+                : [
+                    response.data?.testDetails?.labTestSpecimens
+                      ?.map((data) => data.specimen.name)
+                      .toString()
+                      .replace(/,/g, " "),
+                  ],
+            specimen:
+              response.data?.child?.length > 0
+                ? [...new Set(specimensToAdd.map((data) => data.specimen))]
+                : [
+                    response.data?.testDetails?.labTestSpecimens
+                      ?.map((data) => data.specimen.name)
+                      .toString()
+                      .replace(/,/g, " "),
+                  ],
+          };
+
+          dispatch(
+            handleChangeLabtestData({
+              savedTestArr: [...savedLabtests.savedTestArr, testToBeAdded],
+            })
+          );
+
+          if (selectedTest.type !== "Test") {
+            const childTestIds = testIdsToAdd.map((data) => data.testId);
+            const filteredSavedTest = savedLabtests.savedTestArr?.filter(
+              (data) => !childTestIds.includes(data.id)
             );
-          } else if (
-            childLabTestRequirements.length > 0 &&
-            response?.data?.child.length > 0 &&
-            selectedTest.type !== "Test"
-          ) {
-            setShowLabReqModal(true);
-            childLabTestRequirements.map((test) => {
-              setSelectedLabtestRequirements((prevLabtestReq) => [
-                ...prevLabtestReq,
-                {
-                  id: test.id,
-                  requirementType: test.requirementType,
-                  isRequired: test.isRequired,
-                  requirementDetails: test.requirementDetails,
-                },
-              ]);
-            });
-          } else {
-            const testToBeAdded = {
-              type: response.data?.type,
-              id: response.data?.id,
-              name: response.data?.name,
-              testIds:
-                response.data?.child?.length > 0
-                  ? testIdsToAdd.map((test) => test.testId)
-                  : null,
-              key:
-                response.data?.child?.length > 0
-                  ? [...new Set(specimensToAdd.map((data) => data.specimen))]
-                  : [
-                      response.data?.testDetails?.labTestSpecimens
-                        ?.map((data) => data.specimen.name)
-                        .toString()
-                        .replace(/,/g, " "),
-                    ],
-              specimen:
-                response.data?.child?.length > 0
-                  ? [...new Set(specimensToAdd.map((data) => data.specimen))]
-                  : [
-                      response.data?.testDetails?.labTestSpecimens
-                        ?.map((data) => data.specimen.name)
-                        .toString()
-                        .replace(/,/g, " "),
-                    ],
-            };
+            const testToBeRemoved = savedLabtests.savedTestArr.filter((data) =>
+              childTestIds.includes(data.id)
+            );
 
             dispatch(
               handleChangeLabtestData({
-                savedTestArr: [...savedLabtests.savedTestArr, testToBeAdded],
+                savedTestArr: [...filteredSavedTest, testToBeAdded],
               })
             );
 
-            if (selectedTest.type !== "Test") {
-              const childTestIds = testIdsToAdd.map((data) => data.testId);
-              const filteredSavedTest = savedLabtests.savedTestArr?.filter(
-                (data) => !childTestIds.includes(data.id)
-              );
-              const testToBeRemoved = savedLabtests.savedTestArr.filter(
-                (data) => childTestIds.includes(data.id)
-              );
-
-              dispatch(
-                handleChangeLabtestData({
-                  savedTestArr: [...filteredSavedTest, testToBeAdded],
-                })
-              );
-              if (testToBeRemoved.length > 0) {
-                notification.warning({
-                  message: "Failed to add test",
-                  description: (
-                    <>
-                      <strong>
-                        {" "}
-                        {testToBeRemoved.map((test) => test.name).join(", ")}
-                      </strong>{" "}
-                      {testToBeRemoved.length > 1 ? "are" : "is"} removed
-                      because it is inside of{" "}
-                      <strong>{response?.data?.name}</strong>
-                    </>
+            dispatch(
+              handleChangeLabtestData({
+                specimenCount: [
+                  ...savedLabtests.specimenCount,
+                  ...recursiveSpecimenCount.map((data) =>
+                    specimenNamesInsideSpecimenCount.includes(data.specimenName)
+                      ? {
+                          ...data,
+                          quantity:
+                            data.quantity +
+                            recursiveSpecimenCount.filter((data) =>
+                              data.specimenName.includes(
+                                specimenNamesInsideSpecimenCount
+                              )
+                            ).length,
+                        }
+                      : {
+                          specimenName: data.specimenName,
+                          quantity: 1,
+                        }
                   ),
-                  placement: "bottomRight",
-                });
-              }
+                ],
+              })
+            );
+            if (testToBeRemoved.length > 0) {
+              notification.warning({
+                message: "Failed to add test",
+                description: (
+                  <>
+                    <strong>
+                      {" "}
+                      {testToBeRemoved.map((test) => test.name).join(", ")}
+                    </strong>{" "}
+                    {testToBeRemoved.length > 1 ? "are" : "is"} removed because
+                    it is inside of <strong>{response?.data?.name}</strong>
+                  </>
+                ),
+                placement: "bottomRight",
+              });
             }
+            // }
             if (response?.data?.child?.length > 0) {
               const filteredSpecimensToAdd = specimensToAdd.filter(
                 (specimen) => {
@@ -382,6 +438,27 @@ const AddSpecimen = () => {
     return selectedTestIds;
   };
 
+  const getSpecimenCountRecursively = (data) => {
+    const specimenNamesCount = [];
+
+    data?.child?.map((item) => {
+      if (item?.testDetails?.labTestSpecimens) {
+        item?.testDetails?.labTestSpecimens.map((data) =>
+          specimenNamesCount.push({
+            specimenName: data?.specimen?.name,
+          })
+        );
+      }
+
+      if (item?.child && item?.child?.length > 0) {
+        const childSpecimens = getSpecimenCountRecursively(item);
+        specimenNamesCount.push(...childSpecimens);
+      }
+    });
+
+    return specimenNamesCount;
+  };
+
   const getLabtestRequirementsRecursively = (data) => {
     let labTestRequirementsData = [];
 
@@ -483,8 +560,8 @@ const AddSpecimen = () => {
       <h1>Add Specimen</h1>
       <h3>SAVED ID'S</h3>
       <pre>{JSON.stringify(savedLabtests.savedSelectedDatas, null, 4)}</pre>
-      <h3>DATA THAT IS BEING SELECTED</h3>
-      <pre>{JSON.stringify(savedLabtests.savedTestArr, null, 4)}</pre>
+      <h3>SPECIMEN COUNT</h3>
+      <pre>{JSON.stringify(savedLabtests.specimenCount, null, 4)}</pre>
       <br />
       <h3>Saved Specimens</h3>
       <pre>{JSON.stringify(savedLabtests.savedSpecimensArr, null, 4)}</pre>
